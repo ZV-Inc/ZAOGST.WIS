@@ -1,0 +1,34 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+<PageTitle>ShipmentWarehouse</PageTitle>
+
+<div class="page">
+	<div class="sidebar">
+		<NavMenu />
+	</div>
+
+	<main>
+		<div class="top-row px-4">
+			<a href="https://docs.microsoft.com/aspnet/" target="_blank">О нас</a>
+		</div>
+
+		<article class="content px-4">
+			<ErrorBoundary @ref="@_errorBoundary" Context="Exception">
+				<ChildContent>
+					@Body
+				</ChildContent>
+				<ErrorContent>
+					<div class="alert bg-danger text-white alert-dismissible">
+						@Exception.GetType(): @Exception.Message
+						<button class="btn-close" data-bs-dismiss="alert" @onclick="@_errorBoundary.Recover"></button>
+					</div>
+				</ErrorContent>
+			</ErrorBoundary>
+		</article>
+	</main>
+</div>
+
+@code {
+	private ErrorBoundary _errorBoundary;
+}

@@ -1,0 +1,41 @@
+﻿@page
+@model ZAOGST.WIS.Pages.ErrorModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Ошибка</title>
+    <link href="~/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="main">
+        <div class="content px-4">
+            <h1 class="text-danger">Ошибка.</h1>
+            <h2 class="text-danger">При обработке вашего запроса произошла ошибка.</h2>
+
+            @if (Model.ShowRequestId)
+            {
+                <p>
+                    <strong>ID запроса:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+
+            <h3>Режим разработчика</h3>
+            <p>
+                Переход в <strong>среду разработки</strong> отображает подробную информацию о возникшей ошибке.
+            </p>
+            <p>
+                <strong>Среда разработки не должна быть включена для развернутых приложений.</strong>
+                Это может привести к отображению конфиденциальной информации из исключений для конечных пользователей.
+                Для локальной отладки включите <strong>среду разработки</strong>, установив для переменной окружения <strong>ASPNETCORE_ENVIRONMENT</strong> значение <strong>Development</strong> и перезапустив приложение.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

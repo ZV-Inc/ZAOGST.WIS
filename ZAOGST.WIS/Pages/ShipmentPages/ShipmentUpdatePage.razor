@@ -1,0 +1,116 @@
+﻿@page "/shipmentupdate/{id:int}"
+@inject IControlBlockService ControlBlockService
+@inject IShippedBallonService ShippedBallonService
+@inject IShippedControlBlockService ShippedControlBlockService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject DataContext Context
+
+@if (_shippedControlBlock != null)
+{
+	<PageTitle>Просмотр блока №@_shippedControlBlock.Number</PageTitle>
+
+	<h3>Просмотр блока №@_shippedControlBlock.Number</h3>
+	<p class="p-1">Тип: @_shippedControlBlock.Type</p>
+	<p class="p-1">Баллоны:</p>
+	@foreach (var ballon in _shippedControlBlock.ShippedBallons)
+	{
+		<p class="p-0">№@ballon.StrainGaugeNumber</p>
+	}
+	<br />
+	<br />
+	<button class="btn btn-primary" @onclick=ReturnToWarehouse>Вернуть на склад</button>
+	<button class="btn btn-danger" @onclick="DeleteCurrentShipmentBlock">Удалить</button>
+	@* <Table TableItem="Shipment" Items="_controlShipment" PageSize="15" RowClickAction="RowClick" class="table table-striped table-sm table-bordered">
+	<Column TableItem="Shipment" Title="№" Field="@(x => x.Number)" Sortable="true" Filterable="true" Width="3%" />
+	<Column TableItem="Shipment" Title="Тип" Field="@(x => x.Type)" Sortable="true" Filterable="true" Width="10%" />
+	<Column TableItem="Shipment" Title="Добавлено" Field="@(x => x.CreatedAt)" Sortable="true" Filterable="true" Width="20%" />
+	<Pager ShowPageNumber="true"></Pager>
+	</Table> *@
+	<br />
+}
+
+@code {
+	//TODO: Сделать список баллонов через таблицу выше
+	[Parameter]
+	public int Id { get; set; }
+	private ShippedControlBlock? _shippedControlBlock;
+	private bool _isBallonFormActive = false;
+
+	private void Show()
+	{
+		_isBallonFormActive = true;
+	}
+
+	private void Hide()
+	{
+		_isBallonFormActive = false;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		_shippedControlBlock = await ShippedControlBlockService.GetSingleShippedControlBlock(Id);
+	}
+
+	private void BackButtonClick()
+	{
+		NavigationManager.NavigateTo("/shipmentsview");
+	}
+
+	private async void DeleteCurrentShipmentBlock()
+	{
+		if (_shippedControlBlock == null) return; //Handle the exception
+		bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены что хотите удалить баллон с тензодатчиком №{_shippedControlBlock.Number}?");
+
+		if (confirmed)
+		{
+			await ShippedControlBlockService.DeleteShippedControlBlock(_shippedControlBlock.Id);
+			NavigationManager.NavigateTo("/shipmentsview");
+		}
+	}
+
+	private async void ReturnToWarehouse()
+	{
+		if (_shippedControlBlock == null || _shippedControlBlock.ShippedBallons == null || _shippedControlBlock.ShippedBallons.Count <= 0) throw new Exception("Не удалось найти отгружаемый блок."); //TODO: Обработать исключение
+
+		List<Ballon> ballons = new();
+
+		ControlBlock oldControlBlock = new()
+			{
+				Number = _shippedControlBlock.Number,
+				Type = _shippedControlBlock.Type,
+				ShippingDate = _shippedControlBlock.ShippingDate
+			};
+
+		ControlBlock? newControlBlock = await ControlBlockService.CreateControlBlock(oldControlBlock);
+
+		if (newControlBlock == null) throw new Exception("Не удалось создать новый блок управления"); //TODO: Handle custom exception
+
+		foreach (var shippedBallon in _shippedControlBlock.ShippedBallons)
+		{
+			Ballon newBallon = new()
+				{
+					StrainGaugeNumber = shippedBallon.StrainGaugeNumber,
+					BallonNumber = shippedBallon.BallonNumber,
+					ControlBlockId = newControlBlock.Id,
+					ControlBlock = newControlBlock
+				};
+
+			ballons.Add(newBallon);
+		}
+
+		foreach (ShippedBallon ballon in _shippedControlBlock.ShippedBallons)
+		{
+			if (Context.ShippedBallons.Contains(ballon))
+				await ShippedBallonService.DeleteShippedBallon(ballon.Id);
+		}
+
+		newControlBlock.Ballons = ballons;
+
+		await ControlBlockService.UpdateControlBlock(newControlBlock);
+
+		await ShippedControlBlockService.DeleteShippedControlBlock(_shippedControlBlock.Id);
+
+		NavigationManager.NavigateTo("/shipmentsview");
+	}
+}

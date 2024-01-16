@@ -1,0 +1,58 @@
+﻿@page "/controlblockcreate"
+@inject IControlBlockService ControlBlockService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Новый блок управления</PageTitle>
+
+<h4>Добавить новый блок управления</h4>
+
+<EditForm Model="@controlBlock" OnValidSubmit="HandleSubmit">
+	<FluentValidationValidator />
+	<div class="form-group my-adaptive-div">
+		<label for="number" class="col-form-label">Номер блока управления</label>
+		<InputNumber id="number" type="number" @bind-Value="controlBlock.Number" class="form-control" placeholder="Номер блока управления"></InputNumber>
+		<ValidationMessage For="() => controlBlock.Number" />
+	</div>
+	<div class="form-group my-adaptive-div">
+		<label for="build">Номер сборки</label>
+		<InputSelect class="form-select form-control" @bind-Value="controlBlock.Type">
+			@foreach (var type in controlBlockTypes)
+			{
+				<option value="@type">@type</option>
+			}
+		</InputSelect>
+		<ValidationMessage For="() => controlBlock.Type" />
+	</div>
+	<div class="form-group my-adaptive-div">
+		<label for="date" class="col-sm-2 col-form-label">Дата отгрузки</label>
+		<InputDate id="date" @bind-Value="shippingDateTime" class="form-control" />
+	</div>
+	<br />
+	<button type="submit" class="btn btn-success">Добавить</button>
+	<button @onclick=BackButtonClick type="button" class="btn btn-secondary">Назад</button>
+</EditForm>
+
+@code {
+	ControlBlock controlBlock = new();
+	List<string> controlBlockTypes = new();
+	DateTime shippingDateTime = DateTime.Now;
+
+	protected override void OnInitialized()
+	{
+		controlBlockTypes = ControlBlockTypes.GetTypesValueList();
+		controlBlock.Number += ControlBlockService.GetLastControlBlockNumber() + 1;
+	}
+
+	private async Task HandleSubmit()
+	{
+		controlBlock.ShippingDate = shippingDateTime.ToShortDateString();
+		controlBlock.Type += $"/№{controlBlock.Number}";
+		await ControlBlockService.CreateControlBlock(controlBlock);
+		NavigationManager.NavigateTo("/controlblocksview");
+	}
+
+	private void BackButtonClick()
+	{
+		NavigationManager.NavigateTo("/controlblocksview");
+	}
+}

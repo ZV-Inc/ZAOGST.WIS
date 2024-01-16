@@ -1,0 +1,47 @@
+﻿@page "/balloncreate"
+@inject IBallonService BallonService
+@inject NavigationManager NavigationManager
+
+<h4>Добавить новый баллон</h4>
+
+<EditForm Model="@ballon" OnValidSubmit="HandleSubmit">
+	<FluentValidationValidator />
+	<div class="form-group my-adaptive-div">
+		<label for="strainGauge" class="form-label">Тензодатчик</label>
+		<InputNumber id="strainGauge" type="strainGauge" @bind-Value="ballon.StrainGaugeNumber" class="form-control" placeholder="Тензодатчик"></InputNumber>
+		<ValidationMessage For="() => ballon.StrainGaugeNumber" />
+	</div>
+
+	<div class="form-group my-adaptive-div">
+		<label for="BallonNumber">Номер баллона</label>
+		<InputSelect class="form-select form-control form-control-sm" @bind-Value="ballon.BallonNumber">
+			@foreach (var number in ballonNumbers)
+			{
+					<option value="@number">@number</option>
+			}
+		</InputSelect>
+		<ValidationMessage For="() => ballon.BallonNumber" />
+	</div>
+	<br />
+	<label>Ready data: @ballon.StrainGaugeNumber, @ballon.BallonNumber</label>
+	<br />
+	<br />
+	<button type="submit" class="btn btn-success">Добавить</button>
+	<button @onclick=BackButtonClick type="button" class="btn btn-secondary">Назад</button>
+</EditForm>
+
+@code {
+	Ballon ballon = new();
+	List<string> ballonNumbers = BallonNumbers.GetProperiesList();
+
+	private async Task HandleSubmit()
+	{
+		await BallonService.CreateBallon(ballon);
+		NavigationManager.NavigateTo("/ballonsview");
+	}
+
+	private void BackButtonClick()
+	{
+		NavigationManager.NavigateTo("/ballonsview");
+	}
+}

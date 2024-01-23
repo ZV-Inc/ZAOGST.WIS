@@ -3,10 +3,10 @@
 public interface IUserService
 {
 	List<User> Users { get; set; }
-	Task LoadUsers();
-	Task<User> GetSingleUserById(int id);
-	Task<User> GetSingleUserByUsername(string Username);
-	Task CreateUser(User user);
-	Task UpdateUser(User user);
-	Task DeleteUser(int id);
+	Task Load();
+	Task<User> GetById(int id);
+	Task<User> GetByUsername(string Username);
+	Task Create(User user);
+	Task Update(User user);
+	Task Delete(int id);
 }

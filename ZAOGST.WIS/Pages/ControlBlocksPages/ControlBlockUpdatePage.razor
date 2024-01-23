@@ -14,7 +14,6 @@
 <EditForm Model="@controlBlock" OnValidSubmit="HandleSubmit">
 	<div class="form-group my-adaptive-div">
 		<label for="build">Номер сборки</label>
-		@* <InputSelect class="form-select form-control form-control-sm" @bind-Value="controlBlock.Type"> *@
 		<InputSelect class="form-select form-control form-control-sm" @bind-Value="currentControlBlockType">
 			@foreach (var type in controlBlockTypes)
 			{
@@ -73,6 +72,174 @@
 			if (_ballon1.ControlBlockId == controlBlock.Id)
 			{
 				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon1, 0)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 2:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon2" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon2 != null && _ballon2.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 1 && _ballon2 == _newBallonList.ToArray()[1])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon2, 1)">Сохранить</button>
+			}
+			if (_ballon2.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon2, 1)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 3:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon3" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon3 != null && _ballon3.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 2 && _ballon3 == _newBallonList.ToArray()[2])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon3, 2)">Сохранить</button>
+			}
+			if (_ballon3.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon3, 2)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 4:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon4" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon4 != null && _ballon4.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 3 && _ballon4 == _newBallonList.ToArray()[3])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon4, 3)">Сохранить</button>
+			}
+			if (_ballon4.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon4, 3)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 5:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon5" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon5 != null && _ballon5.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 4 && _ballon5 == _newBallonList.ToArray()[4])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon5, 4)">Сохранить</button>
+			}
+			if (_ballon5.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon5, 4)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 6:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon6" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon6 != null && _ballon6.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 5 && _ballon6 == _newBallonList.ToArray()[5])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon6, 5)">Сохранить</button>
+			}
+			if (_ballon6.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon6, 5)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 7:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon7" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon7 != null && _ballon7.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 6 && _ballon7 == _newBallonList.ToArray()[6])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon7, 6)">Сохранить</button>
+			}
+			if (_ballon7.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon7, 6)">Удалить</button>
 			}
 		}
 	</div>

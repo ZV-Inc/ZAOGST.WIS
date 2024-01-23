@@ -72,7 +72,8 @@
 
 	private async void LogoutButton()
 	{
-		await LocalSrorageService.RemoveItemAsync("token");
-		await AuthStateProvider.GetAuthenticationStateAsync();
+		var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+		await customAuthStateProvider.UpdateAuthenticationState(null);
+		NavigationManager.NavigateTo("/", true);
 	}
 }

@@ -1,7 +1,9 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Overpass', Helvetica, Arial, sans-serif;
+    /*font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
 }
 
 h1:focus {
@@ -95,6 +97,12 @@ a, .btn-link {
     color: white;
 }
 
+.loading-text-center {
+    position: absolute;
+    left: 41.5%;
+    top: 65%;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg)
@@ -104,3 +112,99 @@ a, .btn-link {
         transform: rotate(360deg)
     }
 }
+
+.custom-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    background: linear-gradient(#092464, #3a0647);
+}
+
+.custom-container {
+    width: 300px;
+    height: 500px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.custom-form .user-box {
+    position: relative;
+    margin-top: 10px;
+}
+
+    .custom-form .user-box .custom-input {
+        width: 100%;
+        padding-left: 10px 0;
+        color: #555;
+        background: transparent;
+        font-size: 16px;
+        margin-bottom: 30px;
+        border: none;
+        outline: none;
+        border-bottom: 2px solid #ccc;
+    }
+
+        .custom-form .user-box .custom-input:focus {
+            border-bottom: 2px solid indigo;
+        }
+
+    .custom-form .user-box .custom-label {
+        position: absolute;
+        top: 4px;
+        left: 0;
+        font-size: 16px;
+        color: #555;
+        pointer-events: none;
+        transition: all 0.15s ease;
+    }
+
+    .custom-form .user-box .custom-input:focus ~ .custom-label,
+    .custom-form .user-box .custom-input:valid ~ .custom-label {
+        top: -15px;
+        left: 0;
+        color: indigo;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+.custom-span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .custom-span button {
+        padding: 5px 50px;
+        font-size: 18px;
+        background-color: indigo;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+    }
+
+        .custom-span button:hover {
+            opacity: 0.9;
+        }
+
+.social {
+    margin-top: 60px;
+}
+
+.icons {
+    font-size: 26px;
+    justify-content: space-around;
+    align-items: center;
+    display: flex;
+    margin-top: 20px;
+}
+
+    .icons a {
+        text-decoration: none;
+        color: indigo;
+    }

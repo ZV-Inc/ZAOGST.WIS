@@ -4,8 +4,8 @@ public class ControlBlock : BaseEntity
 {
 	public int Number { get; set; } = 0;
 	public string Type { get; set; } = ControlBlockTypes.TYPE130;
-	public virtual ICollection<Ballon>? Ballons { get; set; } = new HashSet<Ballon>();
-	public string ShippingDate { get; set; } = DateTime.Now.ToShortDateString();
+	public virtual ICollection<Ballon>? Ballons { get; set; } = new HashSet<Ballon>(7);
+	public string ShippingDate { get; set; } = string.Empty;
 }
 
 public class ControlBlockValidator : AbstractValidator<ControlBlock>

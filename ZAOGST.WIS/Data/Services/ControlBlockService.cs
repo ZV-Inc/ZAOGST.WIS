@@ -43,6 +43,7 @@ public class ControlBlockService : IControlBlockService
 	}
 
 	public int GetLastControlBlockNumber() => _context.ControlBlocks.Count();
+
 	public async Task<int> GetLastControlBlockCountNumber()
 	{
 		ControlBlock? controlBlock = await _context.ControlBlocks.OrderByDescending(x => x.Number).FirstOrDefaultAsync();

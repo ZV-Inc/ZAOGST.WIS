@@ -1,0 +1,69 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorageService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<h3>Вход</h3>
+
+<div class="custom-body">
+	<div class="custom-container">
+		<div class="logo">
+			<img width="250px" src="img/Logo-GST_Centr.png" />
+			<br />
+			<br />
+		</div>
+		<EditForm Model="@user" OnValidSubmit=HandleSubmit class="custom-form">
+			<FluentValidationValidator />
+			<div class="user-box">
+				<InputText @bind-Value="@user.Username" class="custom-input" />
+				<label class="custom-label">Имя пользователя</label>
+			</div>
+			<div class="user-box">
+				<InputText @bind-Value="@user.Password" type="password" class="custom-input" />
+				<label class="custom-label">Пароль</label>
+			</div>
+			<span class="custom-span">
+				<button type="submit">Войти</button>
+			</span>
+		</EditForm>
+		<div class="social">
+			<div class="icons">
+				<a href="https://zaogst.ru/" target="_blank" rel="noopener noreferrer" class="fa-solid fa-fire-extinguisher" title="Сайт АО НПЦ ГСТ"></a>
+				<a href="https://github.com/ZV-Inc/ZAOGST.WIS" target="_blank" rel="noopener noreferrer" class="fa-brands fa-github" title="Исходный код"></a>
+			</div>
+		</div>
+	</div>
+</div>
+
+@* <EditForm Model="@user" OnValidSubmit="HandleSubmit">
+	<div class="txt_field">
+		<InputText @bind-Value="user.Username" class="input-text"></InputText>
+		<span></span>
+		<label for="username">Имя</label>
+	</div>
+
+	<div class="txt_field">
+		<InputText id="password" type="password" @bind-Value="user.Password" class="input-text"></InputText>
+		<span></span>
+		<label for="password">Пароль</label>
+	</div>
+	<br />
+	<button type="submit" class="m-1 btn btn-primary">Войти</button>
+</EditForm> *@
+
+@code {
+	UserLoginDto user = new();
+
+	private async Task HandleSubmit()
+	{
+		string baseUrl = "https://localhost:5200/";
+		HttpResponseMessage result = await Http.PostAsJsonAsync($"{baseUrl}api/auth", user);
+		string token = await result.Content.ReadAsStringAsync();
+		await JsRuntime.InvokeAsync<string>("console.log", token);
+		await LocalStorageService.SetItemAsStringAsync("token", token);
+		await AuthStateProvider.GetAuthenticationStateAsync();
+		NavigationManager.NavigateTo("/shipmentsview");
+	}
+}

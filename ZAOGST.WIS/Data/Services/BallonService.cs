@@ -36,7 +36,7 @@ public class BallonService : IBallonService
 
 	public async Task<Ballon> GetSingleBallonByStrainGaugeNumber(int strainGaugeNumber)
 	{
-		var ballon = await _context.Ballons.FirstOrDefaultAsync(x => x.StrainGaugeNumber == strainGaugeNumber);
+		var ballon = await _context.Ballons.FirstOrDefaultAsync(x => x.StrainGaugeNumber == strainGaugeNumber) ?? throw new Exception("Не удалось найти баллон.");
 		return ballon;
 	}
 

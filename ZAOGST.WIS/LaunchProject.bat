@@ -1,2 +1,2 @@
-﻿dotnet run
+dotnet run
 pause

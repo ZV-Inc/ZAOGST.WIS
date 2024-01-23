@@ -18,7 +18,8 @@ public class ShippedBallonService : IShippedBallonService
 			StrainGaugeNumber = shippedBallon.StrainGaugeNumber,
 			BallonNumber = shippedBallon.BallonNumber,
 			ShippedControlBlockId = shippedBallon.ShippedControlBlockId,
-			ShippedControlBlock = shippedBallon.ShippedControlBlock
+			ShippedControlBlock = shippedBallon.ShippedControlBlock,
+			ShippingDate = shippedBallon.ShippingDate
 		};
 
 		await _context.ShippedBallons.AddAsync(dbShippedBallon);

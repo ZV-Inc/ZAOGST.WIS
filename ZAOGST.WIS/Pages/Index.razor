@@ -1,7 +1,10 @@
 ﻿@page "/"
 @inject NavigationManager NavigationManager
 
-<PageTitle>Перенаправление...</PageTitle>
+<PageTitle>Redirecting...</PageTitle>
+
+<div class="loading-rectangle"></div>
+<div class="loading-spinner"></div>
 
 @code {
 	protected override void OnAfterRender(bool firstRender)

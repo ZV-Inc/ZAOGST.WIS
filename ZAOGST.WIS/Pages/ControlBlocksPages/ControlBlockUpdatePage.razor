@@ -22,28 +22,13 @@
 			}
 		</InputSelect>
 	</div>
-	<div class="form-group my-adaptive-div">
-		<label for="date" class="col-sm-2 col-form-label">Дата отгрузки</label>
-		<InputDate id="date" @bind-Value="shippingDateTime" class="form-control" />
-	</div>
+	@* 	<div class="form-group my-adaptive-div">
+	<label for="date" class="col-sm-2 col-form-label">Дата отгрузки</label>
+	<InputDate id="date" @bind-Value="shippingDateTime" class="form-control" />
+	</div> *@
 	<br />
 	<button type="submit" class="btn btn-success">Обновить</button>
 	<button @onclick=BackButtonClick type="button" class="btn btn-secondary">Назад</button>
-	@if (controlBlock.Ballons == null)
-	{
-		<button type="button" style="margin: 5px" class="btn btn-outline-primary" disabled>На отгрузку</button>
-	}
-	else
-	{
-		@if (controlBlock.Ballons.Count == 7 && currentControlBlockType == ControlBlockTypes.TYPE200 || (controlBlock.Ballons.Count == 5 && (currentControlBlockType == ControlBlockTypes.TYPE130 || currentControlBlockType == ControlBlockTypes.TYPE90)))
-		{
-			<button @onclick=SendToShipmentClick type="button" style="margin: 5px" class="btn btn-outline-primary">На отгрузку</button>
-		}
-		else
-		{
-			<button type="button" class="btn btn-outline-primary" style="margin: 5px" disabled>На отгрузку</button>
-		}
-	}
 	<br />
 	<br />
 	<button @onclick="DeleteControlBlock" type="button" class="btn btn-danger">Удалить</button>
@@ -51,20 +36,192 @@
 	<br />
 	<div style="width: 50%; height: 1px; border-bottom: 1px solid black; position: absolute;"></div>
 	<br />
-	@if (controlBlock.Ballons != null && controlBlock.Ballons.Count > 0)
+	@if (controlBlock.Ballons != null && _newBallonList.Count > 0)
 	{
-		foreach (var ballon in controlBlock.Ballons)
+		foreach (var ballon in controlBlock.Ballons.OrderBy(x => x.BallonNumber))
 		{
-			<div class="label">Баллон: №@ballon.StrainGaugeNumber</div>
+			<div class="label">Баллон: №@ballon.StrainGaugeNumber | @ballon.BallonNumber</div>
 		}
 	}
 </EditForm>
 
-<button class="btn btn-dark" type="button" @onclick="ToggleBallonsForm">Добавить баллоны</button>
 <br />
-@if (IsBallonsFormVisible)
+<br />
+@if (currentControlBlockType == ControlBlockTypes.TYPE200)
 {
-	<div class="form-group">
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 1:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon1" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon1 != null && _ballon1.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 0 && _ballon1 == _newBallonList.ToArray()[0])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon1, 0)">Сохранить</button>
+			}
+			if (_ballon1.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon1, 0)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+}
+else
+{
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 1:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon1" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon1 != null && _ballon1.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 0 && _ballon1 == _newBallonList.ToArray()[0])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon1, 0)">Сохранить</button>
+			}
+			if (_ballon1.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon1, 0)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 2:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon2" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon2 != null && _ballon2.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 1 && _ballon2 == _newBallonList.ToArray()[1])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon2, 1)">Сохранить</button>
+			}
+			if (_ballon2.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon2, 1)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 3:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon3" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon3 != null && _ballon3.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 2 && _ballon3 == _newBallonList.ToArray()[2])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon3, 2)">Сохранить</button>
+			}
+			if (_ballon3.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon3, 2)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 4:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon4" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon4 != null && _ballon4.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 3 && _ballon4 == _newBallonList.ToArray()[3])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon4, 3)">Сохранить</button>
+			}
+			if (_ballon4.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon4, 3)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<div class="text-dark">Баллон 5:</div>
+		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon5" EnableDropDown="true" ShowDropDownOnFocus="true">
+			<SelectedTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</SelectedTemplate>
+			<ResultTemplate>
+				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+			</ResultTemplate>
+		</BlazoredTypeahead>
+
+		@if (_ballon5 != null && _ballon5.BallonNumber != BallonNumbers.NONE)
+		{
+			if (controlBlock.Ballons != null && _newBallonList.Count > 4 && _ballon5 == _newBallonList.ToArray()[4])
+			{
+				<button type="button" class="m-1 btn btn-primary" disabled>Сохранить</button>
+			}
+			else
+			{
+				<button type="button" class="m-1 btn btn-primary" @onclick="() => SaveBallonForControlBlock(_ballon5, 4)">Сохранить</button>
+			}
+			if (_ballon5.ControlBlockId == controlBlock.Id)
+			{
+				<button type="button" class="m-1 btn btn-danger" @onclick="() => DeleteBallonFromControlBlock(_ballon5, 4)">Удалить</button>
+			}
+		}
+	</div>
+	<br />
+}
+@* 	<div class="form-group">
 		<br />
 		<br />
 		<label for="ballons">Баллоны</label>
@@ -104,25 +261,58 @@
 			<br />
 			<button type="button" class="btn btn-primary" @onclick="AddToList">Добавить</button>
 		}
+	</div> *@
+<br />
+<EditForm Model="@controlBlock">
+	<div class="form-group my-adaptive-div">
+		<label for="date" class="col-sm-2 col-form-label">Дата отгрузки</label>
+		<InputDate id="date" @bind-Value="shippingDateTime" class="form-control" />
 	</div>
+</EditForm>
+<br />
 
-	@if (controlBlock.Ballons != null && controlBlock.Ballons.Count > 0)
+@if (controlBlock.Ballons == null)
+{
+	<button type="button" style="margin: 5px" class="btn btn-outline-primary" disabled>На отгрузку</button>
+}
+else
+{
+	@if (controlBlock.Ballons.Count == 7 && currentControlBlockType == ControlBlockTypes.TYPE200 || (controlBlock.Ballons.Count == 5 && (currentControlBlockType == ControlBlockTypes.TYPE130 || currentControlBlockType == ControlBlockTypes.TYPE90)))
 	{
-		<p>Selected ballon: @selectedBallon.StrainGaugeNumber</p>
+		<button @onclick=SendToShipmentClick type="button" style="margin: 5px" class="btn btn-outline-primary">На отгрузку</button>
+	}
+	else
+	{
+		<button type="button" class="btn btn-outline-primary" style="margin: 5px" disabled>На отгрузку</button>
 	}
 }
+@* 	@if (controlBlock.Ballons != null && _newBallonList.Count > 0)
+	{
+		<p>Selected ballon: @selectedBallon.StrainGaugeNumber</p>
+	} *@
 
 @code {
+	//TODO: NEED HUGE REFACTOR HERE
 	[Parameter]
 	public int Id { get; set; }
 	ControlBlock controlBlock = new();
 	List<string> controlBlockTypes = ControlBlockTypes.GetTypesValueList();
 	string currentControlBlockType;
 	int currentControlBlockNumber;
-	bool IsBallonsFormVisible = false;
 	List<Ballon> ballons = new();
 	Ballon selectedBallon;
 	DateTime shippingDateTime = DateTime.Now;
+	private Ballon[] _ballonArray = new Ballon[7];
+
+	private Ballon? _ballon1 = null;
+	private Ballon? _ballon2 = null;
+	private Ballon? _ballon3 = null;
+	private Ballon? _ballon4 = null;
+	private Ballon? _ballon5 = null;
+	private Ballon? _ballon6 = null;
+	private Ballon? _ballon7 = null;
+
+	private List<Ballon> _newBallonList = new();
 
 	// List<Ballon> ballonsFromControlBlock = new();
 	private Autocomplete<Ballon, Ballon> _localAutocomplete = default!;
@@ -132,22 +322,142 @@
 		controlBlock = await ControlBlockService.GetSingleControlBlock((int)Id);
 		if (controlBlock == null) throw new Exception("404 — Page not found");
 
+		if (controlBlock.Ballons != null)
+			_newBallonList = controlBlock.Ballons.OrderBy(x => x.BallonNumber).ToList();
+
 		ballons = await Context.Ballons.AsNoTracking().ToListAsync();
 		string[] controlBlockTypeAndNumber = Regex.Split(controlBlock.Type, "/");
 		currentControlBlockType = controlBlockTypeAndNumber[0];
 		int.TryParse(Regex.Match(controlBlockTypeAndNumber[1], @"(?<=№).*$").Value, out int result);
 		currentControlBlockNumber = result;
 		shippingDateTime = DateTime.Parse(controlBlock.ShippingDate);
+
+		// if (currentControlBlockType == ControlBlockTypes.TYPE200)
+		// {
+		// 	for (int b = 0; b < 7; b++)
+		// 	{
+		// 		_newBallonList.Add();
+		// 	}
+		// }
+		// else
+		// {
+
+		// }
+
+		if (controlBlock.Ballons != null && _newBallonList.Count > 0)
+		{
+			if (currentControlBlockType == ControlBlockTypes.TYPE200)
+			{
+				for (int i = 0; i < controlBlock.Ballons.Count; i++)
+				{
+					switch (i)
+					{
+						case 0:
+							_ballon1 = _newBallonList.ToList()[i];
+							break;
+						case 1:
+							_ballon2 = _newBallonList.ToList()[i];
+							break;
+						case 2:
+							_ballon3 = _newBallonList.ToList()[i];
+							break;
+						case 3:
+							_ballon4 = _newBallonList.ToList()[i];
+							break;
+						case 4:
+							_ballon5 = _newBallonList.ToList()[i];
+							break;
+						case 5:
+							_ballon6 = _newBallonList.ToList()[i];
+							break;
+						case 6:
+							_ballon7 = _newBallonList.ToList()[i];
+							break;
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < controlBlock.Ballons.Count; i++)
+				{
+					switch (i)
+					{
+						case 0:
+							_ballon1 = _newBallonList.ToList()[i];
+							break;
+						case 1:
+							_ballon2 = _newBallonList.ToList()[i];
+							break;
+						case 2:
+							_ballon3 = _newBallonList.ToList()[i];
+							break;
+						case 3:
+							_ballon4 = _newBallonList.ToList()[i];
+							break;
+						case 4:
+							_ballon5 = _newBallonList.ToList()[i];
+							break;
+					}
+				}
+			}
+		}
 		// foreach (var ballon in controlBlock.Ballons)
 		// {
 		// 	ballonsFromControlBlock.Add(await BallonService.GetSingleBallonById(ballon.Id));
 		// }
 	}
 
-	private void ToggleBallonsForm()
+	private async void ChangeBallon(Ballon ballon, int arrayPosition)
 	{
-		IsBallonsFormVisible = !IsBallonsFormVisible;
-		// InvokeAsync(StateHasChanged);
+		var oldBallon = controlBlock.Ballons.ToList()[arrayPosition];
+		oldBallon.ControlBlockId = null;
+		oldBallon.ControlBlock = null;
+
+		ballon.ControlBlockId = controlBlock.Id;
+		ballon.ControlBlock = controlBlock;
+		controlBlock.Ballons.ToArray().SetValue(ballon, arrayPosition);
+		// controlBlock.Ballons.ToList()[arrayPosition] = ballon;
+		await BallonService.UpdateBallon(oldBallon);
+		await BallonService.UpdateBallon(ballon);
+	} //TODO: При обновлении баллона он ускакивает на позицию выше в массиве (после обновления страницы)
+
+	private async void SaveBallonForControlBlock(Ballon? ballon, int arrayPosition)
+	{
+		if (ballon == null) throw new Exception("Невозможно добавить пустой баллон");
+
+		if (controlBlock.Ballons.Contains(ballon)) return;
+
+		if (controlBlock.Ballons != null && _newBallonList.Count > 0 && arrayPosition <= controlBlock.Ballons.Count - 1)
+		{
+			ChangeBallon(ballon, arrayPosition);
+			await InvokeAsync(StateHasChanged);
+		}
+		else
+		{
+			ballon.ControlBlockId = controlBlock.Id;
+			ballon.ControlBlock = controlBlock;
+			await BallonService.UpdateBallon(ballon); //TODO: Для асинхронных методов добавить приписку async (например: UpdateBallonAsync)
+		}
+
+		// var newBallonsList = controlBlock.Ballons.OrderBy(x=>x.BallonNumber).ToList();
+		// controlBlock.Ballons.Clear();
+
+		// foreach(var item in newBallonsList)
+		// {
+		// 	controlBlock.Ballons.Add(item);
+		// }
+
+		// await ControlBlockService.UpdateControlBlock(controlBlock);
+
+		NavigationManager.NavigateTo($"/controlblockupdate/{Id}", true);
+	}
+
+	private async void DeleteBallonFromControlBlock(Ballon ballon, int arrayPosition)
+	{
+		ballon.ControlBlockId = null;
+		ballon.ControlBlock = null;
+		await BallonService.UpdateBallon(ballon);
+		NavigationManager.NavigateTo($"/controlblockupdate/{Id}", true);
 	}
 
 	private void AddToList()
@@ -156,17 +466,24 @@
 			controlBlock.Ballons.Add(selectedBallon);
 	}
 
-	// private async Task AddToList(int number)
-	// {
-	// 	var ballon = await BallonService.GetSingleBallonByStrainGaugeNumber(number);
-	// 	selectedBallons.Add(ballon);
-	// 	controlBlock.Ballons = selectedBallons;
-	// }
-
 	private async Task<IEnumerable<Ballon>> searchBallons(string searchNumber) //TODO: Сделать адекватный поиск
 	{
-		return await Task.FromResult(ballons.Where(x => x.StrainGaugeNumber.ToString().Contains(searchNumber) && x.ControlBlock == null && x.ControlBlock == null && x.BallonNumber != BallonNumbers.NONE).ToList());
+		string controlBlockTypeNumber = Regex.Match(currentControlBlockType, @"(?<=\().+?(?=\))").Value;
+		var result = await Task.FromResult(ballons.Where(x => x.StrainGaugeNumber.ToString().Contains(searchNumber)).Where(x => x.ControlBlockId == null).Where(x => x.ControlBlock == null).Where(x => x.BallonNumber != BallonNumbers.NONE).Where(x => Regex.Match(x.BallonNumber, @"(?<=\-).+?(?=\()").Value == controlBlockTypeNumber).ToList());
+		return result;
+		// return await Task.FromResult(ballons.Where(x => x.StrainGaugeNumber.ToString().Contains(searchNumber) && x.ControlBlock == null && x.ControlBlock == null && x.BallonNumber != BallonNumbers.NONE).ToList());
+
+		// return DeleteSelectedBallon(result, ballon);
+		// var result = await Task.FromResult(ballons.Where(x => x.StrainGaugeNumber.ToString().Contains(searchNumber) && x.ControlBlock == null && x.ControlBlock == null && x.BallonNumber != BallonNumbers.NONE).ToList());
+		// if (result.Contains(_ballon1) || result.Contains(_ballon2) || result.Contains(_ballon3) || result.Contains(_ballon4) || result.Contains(_ballon5) || result.Contains(_ballon6) || result.Contains(_ballon7))
+		// List<Ballon> resultList = result;
+		// return resultList;
 	}
+
+	// private List<Ballon> DeleteSelectedBallon(List<Ballon> ballonsList, Ballon? ballon)
+	// {
+	// 	if (ballon == null) return ballonsList; //TODO: Throw exception
+	// }
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -177,48 +494,57 @@
 
 	private async Task HandleSubmit()
 	{
-		if (controlBlock.Ballons == null) return; //TODO: Throw exception
-
 		controlBlock.Type = $"{currentControlBlockType}/№{currentControlBlockNumber}";
 		controlBlock.ShippingDate = shippingDateTime.ToShortDateString();
 		controlBlock.DateUpdated = DateTime.Now;
 
-		if (controlBlock.Ballons.Count == 0)
-		{
-			controlBlock.Ballons.Clear();
-			await ControlBlockService.UpdateControlBlock(controlBlock);
-			NavigationManager.NavigateTo("/controlblocksview");
-		}
-		else if (currentControlBlockType == ControlBlockTypes.TYPE200 && controlBlock.Ballons.Count == 7)
-		{
-			await ControlBlockService.UpdateControlBlock(controlBlock);
-			NavigationManager.NavigateTo("/controlblocksview");
-		}
-		else if ((currentControlBlockType == ControlBlockTypes.TYPE130 || currentControlBlockType == ControlBlockTypes.TYPE90) && controlBlock.Ballons.Count == 5)
-		{
-			await ControlBlockService.UpdateControlBlock(controlBlock);
-			NavigationManager.NavigateTo("/controlblocksview");
-		}
-		else if (currentControlBlockType == ControlBlockTypes.TYPE200 && controlBlock.Ballons.Count != 7)
-		{
-			bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Внесённые изменения не сохранятся, так как кол-во баллонов меньше или больше 7, вы уверены что хотите выйти?");
-
-			if (confirmed)
-			{
-				NavigationManager.NavigateTo("/controlblocksview");
-			}
-		}
-		else if ((currentControlBlockType == ControlBlockTypes.TYPE130 || currentControlBlockType == ControlBlockTypes.TYPE90) && controlBlock.Ballons.Count != 5)
-		{
-			//TODO: Свой класс с подтверждением
-			bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Внесённые изменения не сохранятся, так как кол-во баллонов меньше или больше 5, вы уверены что хотите выйти?");
-
-			if (confirmed)
-			{
-				NavigationManager.NavigateTo("/controlblocksview");
-			}
-		}
+		await ControlBlockService.UpdateControlBlock(controlBlock);
+		NavigationManager.NavigateTo("/controlblocksview");
 	}
+	// private async Task HandleSubmit()
+	// {
+	// 	if (controlBlock.Ballons == null) return; //TODO: Throw exception
+
+	// 	controlBlock.Type = $"{currentControlBlockType}/№{currentControlBlockNumber}";
+	// 	controlBlock.ShippingDate = shippingDateTime.ToShortDateString();
+	// 	controlBlock.DateUpdated = DateTime.Now;
+
+	// 	if (controlBlock.Ballons.Count == 0)
+	// 	{
+	// 		controlBlock.Ballons.Clear();
+	// 		await ControlBlockService.UpdateControlBlock(controlBlock);
+	// 		NavigationManager.NavigateTo("/controlblocksview");
+	// 	}
+	// 	else if (currentControlBlockType == ControlBlockTypes.TYPE200 && controlBlock.Ballons.Count == 7)
+	// 	{
+	// 		await ControlBlockService.UpdateControlBlock(controlBlock);
+	// 		NavigationManager.NavigateTo("/controlblocksview");
+	// 	}
+	// 	else if ((currentControlBlockType == ControlBlockTypes.TYPE130 || currentControlBlockType == ControlBlockTypes.TYPE90) && controlBlock.Ballons.Count == 5)
+	// 	{
+	// 		await ControlBlockService.UpdateControlBlock(controlBlock);
+	// 		NavigationManager.NavigateTo("/controlblocksview");
+	// 	}
+	// 	else if (currentControlBlockType == ControlBlockTypes.TYPE200 && controlBlock.Ballons.Count != 7)
+	// 	{
+	// 		bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Внесённые изменения не сохранятся, так как кол-во баллонов меньше или больше 7, вы уверены что хотите выйти?");
+
+	// 		if (confirmed)
+	// 		{
+	// 			NavigationManager.NavigateTo("/controlblocksview");
+	// 		}
+	// 	}
+	// 	else if ((currentControlBlockType == ControlBlockTypes.TYPE130 || currentControlBlockType == ControlBlockTypes.TYPE90) && controlBlock.Ballons.Count != 5)
+	// 	{
+	// 		//TODO: Свой класс с подтверждением
+	// 		bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Внесённые изменения не сохранятся, так как кол-во баллонов меньше или больше 5, вы уверены что хотите выйти?");
+
+	// 		if (confirmed)
+	// 		{
+	// 			NavigationManager.NavigateTo("/controlblocksview");
+	// 		}
+	// 	}
+	// }
 
 	private async Task DeleteControlBlock()
 	{
@@ -241,6 +567,9 @@
 		if (controlBlock.Ballons == null) return;
 		if (controlBlock.Type == ControlBlockTypes.TYPE200 && controlBlock.Ballons.Count != 7) return;
 		if (((controlBlock.Type == ControlBlockTypes.TYPE130 || controlBlock.Type == ControlBlockTypes.TYPE90) && controlBlock.Ballons.Count != 5)) return;
+
+		controlBlock.ShippingDate = shippingDateTime.ToShortDateString();
+		await ControlBlockService.UpdateControlBlock(controlBlock);
 
 		//TODO: Отправить на отгрузку
 		ShippedControlBlock shippedControlBlock = new()
@@ -271,6 +600,7 @@
 			shippedBallon.BallonNumber = ballon.BallonNumber;
 			shippedBallon.ShippedControlBlockId = shippedBlock.Id;/* ballon.ControlBlockId; */
 			shippedBallon.ShippedControlBlock = shippedBlock;
+			shippedBallon.ShippingDate = shippedBlock.ShippingDate;
 			// shippedBallons.Add(shippedBallon);
 			await ShippedBallonService.CreateShippedBallon(shippedBallon);
 		}

@@ -4,26 +4,24 @@
 
 <h4>Добавить новый баллон</h4>
 
-<EditForm Model="@ballon" OnValidSubmit="HandleSubmit">
+<EditForm Model="@_ballon" OnValidSubmit="HandleSubmit">
 	<FluentValidationValidator />
 	<div class="form-group my-adaptive-div">
-		<label for="strainGauge" class="form-label">Тензодатчик</label>
-		<InputNumber id="strainGauge" type="strainGauge" @bind-Value="ballon.StrainGaugeNumber" class="form-control" placeholder="Тензодатчик"></InputNumber>
-		<ValidationMessage For="() => ballon.StrainGaugeNumber" />
+		<label class="form-label">Тензодатчик</label>
+		<InputNumber @bind-Value="_ballon.StrainGaugeNumber" class="form-control" placeholder="Тензодатчик"></InputNumber>
+		<ValidationMessage For="() => _ballon.StrainGaugeNumber" />
 	</div>
 
 	<div class="form-group my-adaptive-div">
 		<label for="BallonNumber">Номер баллона</label>
-		<InputSelect class="form-select form-control form-control-sm" @bind-Value="ballon.BallonNumber">
-			@foreach (var number in ballonNumbers)
+		<InputSelect class="form-select form-control form-control-sm" @bind-Value="_ballon.BallonNumber">
+			@foreach (var number in _ballonNumbers)
 			{
-					<option value="@number">@number</option>
+				<option value="@number">@number</option>
 			}
 		</InputSelect>
-		<ValidationMessage For="() => ballon.BallonNumber" />
+		<ValidationMessage For="() => _ballon.BallonNumber" />
 	</div>
-	<br />
-	<label>Ready data: @ballon.StrainGaugeNumber, @ballon.BallonNumber</label>
 	<br />
 	<br />
 	<button type="submit" class="btn btn-success">Добавить</button>
@@ -31,12 +29,12 @@
 </EditForm>
 
 @code {
-	Ballon ballon = new();
-	List<string> ballonNumbers = BallonNumbers.GetProperiesList();
+	private Ballon _ballon = new();
+	private List<string> _ballonNumbers = BallonNumbers.GetProperiesList();
 
 	private async Task HandleSubmit()
 	{
-		await BallonService.CreateBallon(ballon);
+		await BallonService.CreateBallon(_ballon);
 		NavigationManager.NavigateTo("/ballonsview");
 	}
 

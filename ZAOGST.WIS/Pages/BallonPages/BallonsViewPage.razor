@@ -9,6 +9,7 @@
 {
 	<div class="loading-rectangle"></div>
 	<div class="loading-spinner"></div>
+	<div><p class ="loading-text-center">Добавление баллона @CurrentRandomBallonLoadNumber из @RANDOM_BALLON_COUNT ... Пожалуйста подождите...</p></div>
 }
 else
 {
@@ -31,6 +32,8 @@ else
 @code {
 	[Parameter]
 	public bool IsLoading { get; set; } = false;
+	public const int RANDOM_BALLON_COUNT = 17;
+	public int CurrentRandomBallonLoadNumber = 1;
 	private Ballon _ballon = new();
 	private Ballon[] _ballonData;
 	private Ballon _selectedBallon;
@@ -71,7 +74,7 @@ else
 		NavigationManager.NavigateTo($"/ballonupdate/{id}");
 	}
 
-	private async void CreateNewBallon()
+	private void CreateNewBallon()
 	{
 		NavigationManager.NavigateTo("/balloncreate");
 		// await InvokeAsync(StateHasChanged);
@@ -93,6 +96,8 @@ else
 					BallonNumber = BallonNumbers.GetProperiesList()[_random.Next(1, 16)]
 				};
 
+			CurrentRandomBallonLoadNumber = i + 1;
+			await InvokeAsync(StateHasChanged);
 			await BallonService.CreateBallon(ballon);
 		}
 

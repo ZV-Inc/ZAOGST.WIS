@@ -12,15 +12,24 @@
 
 	<h3>Просмотр блока №@_shippedControlBlock.Number</h3>
 	<p class="p-1">Тип: @_shippedControlBlock.Type</p>
+	<p class="p-1">Дата отгрузки: @_shippedControlBlock.ShippingDate</p>
 	<p class="p-1">Баллоны:</p>
-	@foreach (var ballon in _shippedControlBlock.ShippedBallons)
+	@foreach (var ballon in _shippedControlBlock.ShippedBallons.OrderBy(x => x.BallonNumber))
 	{
-		<p class="p-0">№@ballon.StrainGaugeNumber</p>
+		<p class="p-1">№@ballon.StrainGaugeNumber | @ballon.BallonNumber (Дата отгрузки: @ballon.ShippingDate)</p>
 	}
 	<br />
 	<br />
-	<button class="btn btn-primary" @onclick=ReturnToWarehouse>Вернуть на склад</button>
-	<button class="btn btn-danger" @onclick="DeleteCurrentShipmentBlock">Удалить</button>
+	<AuthorizeView>
+		<Authorized>
+			<button class="btn btn-primary" @onclick=ReturnToWarehouse>Вернуть на склад</button>
+			<button class="btn btn-danger" @onclick="DeleteCurrentShipmentBlock">Удалить</button>
+			<button class="btn btn-secondary" @onclick="BackButtonClick">Назад</button>
+		</Authorized>
+		<NotAuthorized>
+			<button class="btn btn-secondary" @onclick="BackButtonClick">Назад</button>
+		</NotAuthorized>
+	</AuthorizeView>
 	@* <Table TableItem="Shipment" Items="_controlShipment" PageSize="15" RowClickAction="RowClick" class="table table-striped table-sm table-bordered">
 	<Column TableItem="Shipment" Title="№" Field="@(x => x.Number)" Sortable="true" Filterable="true" Width="3%" />
 	<Column TableItem="Shipment" Title="Тип" Field="@(x => x.Type)" Sortable="true" Filterable="true" Width="10%" />

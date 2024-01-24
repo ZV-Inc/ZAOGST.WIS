@@ -27,6 +27,11 @@
 				<label class="custom-label">Пароль</label>
 				<ValidationMessage For="() => user.Password" />
 			</div>
+			<div class="user-box">
+				<InputText @bind-Value="@_passwordConfirmation" type="password" class="custom-input" />
+				<label class="custom-label">Подтвердите пароль</label>
+				<ValidationMessage For="() => user.Password" />
+			</div>
 			<span class="custom-span">
 				<button type="submit">Войти</button>
 			</span>
@@ -58,6 +63,7 @@
 
 @code {
 	UserLoginDto user = new();
+	private string _passwordConfirmation = string.Empty;
 
 	private async Task Authenticate()
 	{
@@ -66,6 +72,12 @@
 		if(userEntity == null || userEntity.Password != user.Password)
 		{
 			await JsRuntime.InvokeVoidAsync("alert", "Неверное имя пользователя или пароль.");
+			return;
+		}
+
+		if (user.Password != _passwordConfirmation)
+		{
+			await JsRuntime.InvokeVoidAsync("alert", "Пароли не совпадают.");
 			return;
 		}
 

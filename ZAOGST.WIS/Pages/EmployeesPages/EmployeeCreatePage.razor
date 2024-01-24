@@ -1,0 +1,56 @@
+﻿@page "/employeecreate"
+@inject IUserService UserService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<PageTitle>Добавить сотрудника</PageTitle>
+
+<h3>Добавить сотрудника</h3>
+
+<EditForm Model="@_user" OnValidSubmit="HandleSubmit">
+	<FluentValidationValidator />
+	<div class="form-group my-adaptive-div">
+		<label for="username" class="col-form-label">Логин</label>
+		<InputText id="username" @bind-Value="_user.Username" class="form-control" placeholder="Логин сотрудника"></InputText>
+		<ValidationMessage For="() => _user.Username" />
+	</div>
+	<div class="form-group my-adaptive-div">
+		<label for="password" class="col-form-label">Пароль</label>
+		<InputText id="password" @bind-Value="_user.Password" class="form-control" placeholder="Пароль сотрудника"></InputText>
+		<ValidationMessage For="() => _user.Password" />
+	</div>
+	<div class="form-group my-adaptive-div">
+		<label for="role" class="col-form-label">Роль</label>
+		<InputSelect class="form-select form-control" @bind-Value="_user.Role">
+			@foreach (var role in _userRoles)
+			{
+				<option value="@role">@role</option>
+			}
+		</InputSelect>
+	</div>
+	<br />
+	<button type="submit" class="btn btn-success">Добавить</button>
+	<button @onclick=BackButtonClick type="button" class="btn btn-secondary">Назад</button>
+</EditForm>
+
+@code {
+	private User _user = new();
+	private List<string> _userRoles = UserRoles.GetList();
+
+	protected override void OnInitialized()
+	{
+		_userRoles.Reverse();
+	}
+
+	private async Task HandleSubmit()
+	{
+		_user.DateUpdated = DateTime.Now;
+		await UserService.Create(_user);
+		NavigationManager.NavigateTo("/employeesview");
+	}
+
+	private void BackButtonClick()
+	{
+		NavigationManager.NavigateTo("/employeesview");
+	}
+}

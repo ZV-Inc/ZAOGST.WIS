@@ -3,7 +3,7 @@
 		<Found Context="routeData">
 			<AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
 				<NotAuthorized>
-					Извините, вы не авторизованы чтобы просматривать эту страницу.
+					Извините, у вас не достаточно прав чтобы просматривать эту страницу.
 				</NotAuthorized>
 			</AuthorizeRouteView>
 			<FocusOnNavigate RouteData="@routeData" Selector="h1" />

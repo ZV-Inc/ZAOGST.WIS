@@ -2,6 +2,7 @@
 @inject IJSRuntime JsRuntime
 @inject IBallonService BallonService
 @inject NavigationManager NavigationManager
+@attribute [Authorize]
 
 <PageTitle>Баллоны</PageTitle>
 
@@ -93,7 +94,7 @@ else
 			Ballon ballon = new()
 				{
 					StrainGaugeNumber = _random.Next(1, 999999),
-					BallonNumber = BallonNumbers.GetProperiesList()[_random.Next(1, 16)]
+					BallonNumber = BallonNumbers.GetBallonTypes()[_random.Next(1, 16)]
 				};
 
 			CurrentRandomBallonLoadNumber = i + 1;

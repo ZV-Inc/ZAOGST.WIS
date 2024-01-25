@@ -17,7 +17,7 @@
 			<br />
 			<br />
 		</div>
-		<EditForm Model="@_user" OnValidSubmit=HandleSubmit class="custom-form">
+		<EditForm Model="@_user" OnValidSubmit="() => HandleSubmit()" class="custom-form">
 			<FluentValidationValidator />
 			<div class="user-box">
 				<InputText @bind-Value="@_user.Username" class="custom-input" />
@@ -27,11 +27,6 @@
 			<div class="user-box">
 				<InputText @bind-Value="@_user.Password" type="password" class="custom-input" />
 				<label class="custom-label">Пароль</label>
-				<ValidationMessage For="() => _user.Password" />
-			</div>
-			<div class="user-box">
-				<InputText @bind-Value="@_passwordConfirmation" type="password" class="custom-input" />
-				<label class="custom-label">Подтвердите пароль</label>
 				<ValidationMessage For="() => _user.Password" />
 			</div>
 			<span class="custom-span">
@@ -48,8 +43,7 @@
 </div>
 
 @code {
-	private User _user = new();
-	private string _passwordConfirmation = string.Empty;
+	private UserLoginDto _user = new();
 
 	private async Task HandleSubmit()
 	{
@@ -58,12 +52,6 @@
 		if (userEntity == null || userEntity.Password != _user.Password)
 		{
 			await JsRuntime.InvokeVoidAsync("alert", "Неверное имя пользователя или пароль.");
-			return;
-		}
-
-		if (_user.Password != _passwordConfirmation)
-		{
-			await JsRuntime.InvokeVoidAsync("alert", "Пароли не совпадают.");
 			return;
 		}
 

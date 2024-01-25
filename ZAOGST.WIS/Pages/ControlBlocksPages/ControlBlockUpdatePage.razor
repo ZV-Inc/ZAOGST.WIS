@@ -30,8 +30,7 @@
 	<button @onclick="DeleteControlBlock" type="button" class="btn btn-danger">Удалить</button>
 	<br />
 	<br />
-	<div style="width: 50%; height: 1px; border-bottom: 1px solid black; position: absolute;"></div>
-	<br />
+	<hr />
 	@if (_controlBlock.Ballons != null && _newBallonList.Count > 0)
 	{
 		foreach (var ballon in _controlBlock.Ballons.OrderBy(x => x.BallonNumber))
@@ -41,7 +40,6 @@
 	}
 </EditForm>
 
-<br />
 <br />
 @if (_currentControlBlockType == ControlBlockTypes.TYPE200)
 {
@@ -474,10 +472,14 @@ else
 	@if (_controlBlock.Ballons.Count == 7 && _currentControlBlockType == ControlBlockTypes.TYPE200 || (_controlBlock.Ballons.Count == 5 && (_currentControlBlockType == ControlBlockTypes.TYPE130 || _currentControlBlockType == ControlBlockTypes.TYPE90)))
 	{
 		<button @onclick=SendToShipmentClick type="button" style="margin: 5px" class="btn btn-outline-primary">На отгрузку</button>
+		<br />
+		<br />
 	}
 	else
 	{
 		<button type="button" class="btn btn-outline-primary" style="margin: 5px" disabled>На отгрузку</button>
+		<br />
+		<br />
 	}
 }
 
@@ -512,7 +514,7 @@ else
 		if (_controlBlock == null) throw new ControlBlockNotFoundException();
 
 		if (_controlBlock.Ballons != null)
-			_newBallonList = _controlBlock.Ballons.OrderBy(x => x.BallonNumber).ToList();
+			_newBallonList = _controlBlock.Ballons.OrderBy(x => x.StrainGaugeNumber).ToList();
 
 		_ballons = await Context.Ballons.AsNoTracking().ToListAsync();
 		string[] controlBlockTypeAndNumber = Regex.Split(_controlBlock.Type, "/");

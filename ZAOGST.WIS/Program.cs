@@ -8,7 +8,6 @@ global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 
-global using System.Collections.Immutable;
 global using System.Security.Claims;
 global using System.Text.Json;
 
@@ -18,6 +17,7 @@ global using ZAOGST.WIS.Data.DataBaseContext;
 global using ZAOGST.WIS.Data.Entities;
 global using ZAOGST.WIS.Data.Interfaces;
 global using ZAOGST.WIS.Data.Services;
+global using ZAOGST.WIS.Dto;
 
 var builder = WebApplication.CreateBuilder(args);
 

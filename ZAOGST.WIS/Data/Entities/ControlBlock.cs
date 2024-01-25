@@ -42,7 +42,7 @@ public class ControlBlockTypes
 	public const string TYPE130 = "СКП2.00.54.200-01 (130)";
 	public const string TYPE200 = "СКП2.00.54.200-02 (200)";
 
-	public static readonly ImmutableArray<string> TypesList = new()
+	public static readonly List<string> TypesList = new()
 	{
 		TYPE130, TYPE200, TYPE90
 	};

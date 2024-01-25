@@ -37,10 +37,10 @@
 	List<string> controlBlockTypes = new();
 	DateTime shippingDateTime = DateTime.Now;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		controlBlockTypes = ControlBlockTypes.GetTypesValueList();
-		controlBlock.Number += ControlBlockService.GetLastControlBlockNumber() + 1;
+		controlBlock.Number += await ControlBlockService.GetLastControlBlockNumber() + 1;
 	}
 
 	private async Task HandleSubmit()

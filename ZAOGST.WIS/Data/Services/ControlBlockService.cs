@@ -42,7 +42,20 @@ public class ControlBlockService : IControlBlockService
 		await _context.SaveChangesAsync();
 	}
 
-	public int GetLastControlBlockNumber() => _context.ControlBlocks.Count();
+	public async Task<int> GetLastControlBlockNumber()
+	{
+		List<ControlBlock> controlBlocksList = await _context.ControlBlocks.ToListAsync();
+
+		if(controlBlocksList == null || controlBlocksList.Count <= 0)
+			return 1;
+
+		ControlBlock? lastControlBlock = controlBlocksList.OrderBy(x => x.Number).LastOrDefault();
+
+		if (lastControlBlock == null)
+			return 1;
+
+		return lastControlBlock.Number;
+	}
 
 	public async Task<int> GetLastControlBlockCountNumber()
 	{

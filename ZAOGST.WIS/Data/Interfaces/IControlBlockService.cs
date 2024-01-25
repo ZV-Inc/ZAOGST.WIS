@@ -9,7 +9,7 @@ public interface IControlBlockService
 	//Task CreateControlBlock(ControlBlock controlBlock);
 	Task UpdateControlBlock(ControlBlock controlBlock);
 	Task DeleteControlBlock(int id);
-	int GetLastControlBlockNumber();
+	Task<int> GetLastControlBlockNumber();
 	Task<List<Ballon>?> GetBallonsList(int id);
 	Task<int> GetLastControlBlockCountNumber();
 }

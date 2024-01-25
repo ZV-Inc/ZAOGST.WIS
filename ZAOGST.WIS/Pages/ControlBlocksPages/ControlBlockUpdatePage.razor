@@ -78,14 +78,21 @@
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 2:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon2" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon1 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon2" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon2 != null && _ballon2.BallonNumber != BallonNumbers.NONE)
 		{
@@ -106,14 +113,21 @@
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 3:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon3" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon2 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon3" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon3 != null && _ballon3.BallonNumber != BallonNumbers.NONE)
 		{
@@ -134,14 +148,21 @@
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 4:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon4" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon3 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon4" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon4 != null && _ballon4.BallonNumber != BallonNumbers.NONE)
 		{
@@ -162,14 +183,21 @@
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 5:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon5" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon4 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon5" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon5 != null && _ballon5.BallonNumber != BallonNumbers.NONE)
 		{
@@ -190,14 +218,21 @@
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 6:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon6" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon5 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon6" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon6 != null && _ballon6.BallonNumber != BallonNumbers.NONE)
 		{
@@ -218,14 +253,21 @@
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 7:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon7" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon6 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon7" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon7 != null && _ballon7.BallonNumber != BallonNumbers.NONE)
 		{
@@ -277,14 +319,21 @@ else
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 2:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon2" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon1 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon2" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon2 != null && _ballon2.BallonNumber != BallonNumbers.NONE)
 		{
@@ -305,14 +354,21 @@ else
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 3:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon3" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon2 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon3" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon3 != null && _ballon3.BallonNumber != BallonNumbers.NONE)
 		{
@@ -333,14 +389,21 @@ else
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 4:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon4" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+		@if (_ballon3 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon4" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon4 != null && _ballon4.BallonNumber != BallonNumbers.NONE)
 		{
@@ -361,14 +424,22 @@ else
 	<br />
 	<div class="form-group my-adaptive-div">
 		<div class="text-dark">Баллон 5:</div>
-		<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="searchBallons" @bind-Value="_ballon5" EnableDropDown="true" ShowDropDownOnFocus="true">
-			<SelectedTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</SelectedTemplate>
-			<ResultTemplate>
-				<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
-			</ResultTemplate>
-		</BlazoredTypeahead>
+
+		@if (_ballon4 == null)
+		{
+			<input class="input-group" disabled />
+		}
+		else
+		{
+			<BlazoredTypeahead MaximumSuggestions="5" SearchMethod="async (x) => await searchBallons(x)" @bind-Value="_ballon5" EnableDropDown="true" ShowDropDownOnFocus="true">
+				<SelectedTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</SelectedTemplate>
+				<ResultTemplate>
+					<div>@context.StrainGaugeNumber | @context.BallonNumber</div>
+				</ResultTemplate>
+			</BlazoredTypeahead>
+		}
 
 		@if (_ballon5 != null && _ballon5.BallonNumber != BallonNumbers.NONE)
 		{
@@ -636,8 +707,15 @@ else
 	private async Task<IEnumerable<Ballon>> searchBallons(string searchNumber) //TODO: Сделать адекватный поиск
 	{
 		string controlBlockTypeNumber = Regex.Match(currentControlBlockType, @"(?<=\().+?(?=\))").Value;
-		var result = await Task.FromResult(ballons.Where(x => x.StrainGaugeNumber.ToString().Contains(searchNumber)).Where(x => x.ControlBlockId == null).Where(x => x.ControlBlock == null).Where(x => x.BallonNumber != BallonNumbers.NONE).Where(x => Regex.Match(x.BallonNumber, @"(?<=\-).+?(?=\()").Value == controlBlockTypeNumber).ToList());
-		return result;
+		var result = await Task.FromResult(ballons
+			.Where(x => x.StrainGaugeNumber.ToString().Contains(searchNumber))
+			.Where(x => x.ControlBlockId == null)
+			.Where(x => x.ControlBlock == null)
+			.Where(x => x.BallonNumber != BallonNumbers.NONE)
+			.Where(x => Regex.Match(x.BallonNumber, @"(?<=\-).+?(?=\()").Value == controlBlockTypeNumber).ToList());
+
+		var sorteredResult = result.OrderBy(x => x.StrainGaugeNumber);
+		return sorteredResult;
 		// return await Task.FromResult(ballons.Where(x => x.StrainGaugeNumber.ToString().Contains(searchNumber) && x.ControlBlock == null && x.ControlBlock == null && x.BallonNumber != BallonNumbers.NONE).ToList());
 
 		// return DeleteSelectedBallon(result, ballon);

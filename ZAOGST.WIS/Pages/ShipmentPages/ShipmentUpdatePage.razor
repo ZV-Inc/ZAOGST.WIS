@@ -1,10 +1,11 @@
 ﻿@page "/shipmentupdate/{id:int}"
+@attribute [Authorize]
 @inject IControlBlockService ControlBlockService
+@inject IJSRuntime JsRuntime
 @inject IShippedBallonService ShippedBallonService
 @inject IShippedControlBlockService ShippedControlBlockService
-@inject NavigationManager NavigationManager
-@inject IJSRuntime JsRuntime
 @inject DataContext Context
+@inject NavigationManager NavigationManager
 
 @if (_shippedControlBlock != null)
 {
@@ -24,57 +25,35 @@
 		<Authorized>
 			<button class="btn btn-primary" @onclick=ReturnToWarehouse>Вернуть на склад</button>
 			<button class="btn btn-danger" @onclick="DeleteCurrentShipmentBlock">Удалить</button>
-			<button class="btn btn-secondary" @onclick="BackButtonClick">Назад</button>
+			<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
 		</Authorized>
 		<NotAuthorized>
-			<button class="btn btn-secondary" @onclick="BackButtonClick">Назад</button>
+			<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
 		</NotAuthorized>
 	</AuthorizeView>
-	@* <Table TableItem="Shipment" Items="_controlShipment" PageSize="15" RowClickAction="RowClick" class="table table-striped table-sm table-bordered">
-	<Column TableItem="Shipment" Title="№" Field="@(x => x.Number)" Sortable="true" Filterable="true" Width="3%" />
-	<Column TableItem="Shipment" Title="Тип" Field="@(x => x.Type)" Sortable="true" Filterable="true" Width="10%" />
-	<Column TableItem="Shipment" Title="Добавлено" Field="@(x => x.CreatedAt)" Sortable="true" Filterable="true" Width="20%" />
-	<Pager ShowPageNumber="true"></Pager>
-	</Table> *@
 	<br />
 }
 
 @code {
-	//TODO: Сделать список баллонов через таблицу выше
+	//TODO: Сделать список баллонов через таблицу
 	[Parameter]
 	public int Id { get; set; }
 	private ShippedControlBlock? _shippedControlBlock;
-	private bool _isBallonFormActive = false;
-
-	private void Show()
-	{
-		_isBallonFormActive = true;
-	}
-
-	private void Hide()
-	{
-		_isBallonFormActive = false;
-	}
 
 	protected override async Task OnInitializedAsync()
 	{
-		_shippedControlBlock = await ShippedControlBlockService.GetSingleShippedControlBlock(Id);
-	}
-
-	private void BackButtonClick()
-	{
-		NavigationManager.NavigateTo("/shipmentsview");
+		_shippedControlBlock = await ShippedControlBlockService.GetById(Id);
 	}
 
 	private async void DeleteCurrentShipmentBlock()
 	{
-		if (_shippedControlBlock == null) return; //Handle the exception
+		if (_shippedControlBlock == null) throw new ShippedControlBlockNotFoundException();
 		bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены что хотите удалить баллон с тензодатчиком №{_shippedControlBlock.Number}?");
 
 		if (confirmed)
 		{
-			await ShippedControlBlockService.DeleteShippedControlBlock(_shippedControlBlock.Id);
-			NavigationManager.NavigateTo("/shipmentsview");
+			await ShippedControlBlockService.Delete(_shippedControlBlock.Id);
+			ToPreviousPage();
 		}
 	}
 
@@ -91,9 +70,9 @@
 				ShippingDate = _shippedControlBlock.ShippingDate
 			};
 
-		ControlBlock? newControlBlock = await ControlBlockService.CreateControlBlock(oldControlBlock);
+		ControlBlock? newControlBlock = await ControlBlockService.Create(oldControlBlock);
 
-		if (newControlBlock == null) throw new Exception("Не удалось создать новый блок управления"); //TODO: Handle custom exception
+		if (newControlBlock == null) throw new CannotCreateNewControlBlockException();
 
 		foreach (var shippedBallon in _shippedControlBlock.ShippedBallons)
 		{
@@ -111,15 +90,20 @@
 		foreach (ShippedBallon ballon in _shippedControlBlock.ShippedBallons)
 		{
 			if (Context.ShippedBallons.Contains(ballon))
-				await ShippedBallonService.DeleteShippedBallon(ballon.Id);
+				await ShippedBallonService.Delete(ballon.Id);
 		}
 
 		newControlBlock.Ballons = ballons;
 
-		await ControlBlockService.UpdateControlBlock(newControlBlock);
+		await ControlBlockService.Update(newControlBlock);
 
-		await ShippedControlBlockService.DeleteShippedControlBlock(_shippedControlBlock.Id);
+		await ShippedControlBlockService.Delete(_shippedControlBlock.Id);
 
+		ToPreviousPage();
+	}
+
+	private void ToPreviousPage()
+	{
 		NavigationManager.NavigateTo("/shipmentsview");
 	}
 }

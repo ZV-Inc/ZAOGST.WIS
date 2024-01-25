@@ -1,6 +1,7 @@
 ﻿@page "/employeecreate"
-@inject IUserService UserService
+@attribute [Authorize(Roles = UserRoles.Admin)]
 @inject IJSRuntime JsRuntime
+@inject IUserService UserService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Добавить сотрудника</PageTitle>
@@ -30,12 +31,12 @@
 	</div>
 	<br />
 	<button type="submit" class="btn btn-success">Добавить</button>
-	<button @onclick=BackButtonClick type="button" class="btn btn-secondary">Назад</button>
+	<button @onclick=ToPreviousPage type="button" class="btn btn-secondary">Назад</button>
 </EditForm>
 
 @code {
 	private User _user = new();
-	private List<string> _userRoles = UserRoles.GetList();
+	private List<string> _userRoles = UserRoles.RolesList.ToList();
 
 	protected override void OnInitialized()
 	{
@@ -46,10 +47,10 @@
 	{
 		_user.DateUpdated = DateTime.Now;
 		await UserService.Create(_user);
-		NavigationManager.NavigateTo("/employeesview");
+		ToPreviousPage();
 	}
 
-	private void BackButtonClick()
+	private void ToPreviousPage()
 	{
 		NavigationManager.NavigateTo("/employeesview");
 	}

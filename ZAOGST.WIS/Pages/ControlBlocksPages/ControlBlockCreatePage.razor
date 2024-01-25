@@ -1,4 +1,5 @@
 ﻿@page "/controlblockcreate"
+@attribute [Authorize]
 @inject IControlBlockService ControlBlockService
 @inject NavigationManager NavigationManager
 
@@ -6,52 +7,52 @@
 
 <h4>Добавить новый блок управления</h4>
 
-<EditForm Model="@controlBlock" OnValidSubmit="HandleSubmit">
+<EditForm Model="@_controlBlock" OnValidSubmit="HandleSubmit">
 	<FluentValidationValidator />
 	<div class="form-group my-adaptive-div">
 		<label for="number" class="col-form-label">Номер блока управления</label>
-		<InputNumber id="number" type="number" @bind-Value="controlBlock.Number" class="form-control" placeholder="Номер блока управления"></InputNumber>
-		<ValidationMessage For="() => controlBlock.Number" />
+		<InputNumber id="number" type="number" @bind-Value="_controlBlock.Number" class="form-control" placeholder="Номер блока управления"></InputNumber>
+		<ValidationMessage For="() => _controlBlock.Number" />
 	</div>
 	<div class="form-group my-adaptive-div">
 		<label for="build">Номер сборки</label>
-		<InputSelect class="form-select form-control" @bind-Value="controlBlock.Type">
-			@foreach (var type in controlBlockTypes)
+		<InputSelect class="form-select form-control" @bind-Value="_controlBlock.Type">
+			@foreach (var type in _controlBlockTypes)
 			{
 				<option value="@type">@type</option>
 			}
 		</InputSelect>
-		<ValidationMessage For="() => controlBlock.Type" />
+		<ValidationMessage For="() => _controlBlock.Type" />
 	</div>
 	<div class="form-group my-adaptive-div">
 		<label for="date" class="col-sm-2 col-form-label">Дата отгрузки</label>
-		<InputDate id="date" @bind-Value="shippingDateTime" class="form-control" />
+		<InputDate id="date" @bind-Value="_shippingDateTime" class="form-control" />
 	</div>
 	<br />
 	<button type="submit" class="btn btn-success">Добавить</button>
-	<button @onclick=BackButtonClick type="button" class="btn btn-secondary">Назад</button>
+	<button @onclick=ToPreviousPage type="button" class="btn btn-secondary">Назад</button>
 </EditForm>
 
 @code {
-	ControlBlock controlBlock = new();
-	List<string> controlBlockTypes = new();
-	DateTime shippingDateTime = DateTime.Now;
+	private ControlBlock _controlBlock = new();
+	private List<string> _controlBlockTypes = new();
+	private DateTime _shippingDateTime = DateTime.Now;
 
 	protected override async Task OnInitializedAsync()
 	{
-		controlBlockTypes = ControlBlockTypes.GetTypesValueList();
-		controlBlock.Number += await ControlBlockService.GetLastControlBlockNumber() + 1;
+		_controlBlockTypes = ControlBlockTypes.TypesList.ToList();
+		_controlBlock.Number += await ControlBlockService.GetLastNumber() + 1;
 	}
 
 	private async Task HandleSubmit()
 	{
-		controlBlock.ShippingDate = shippingDateTime.ToShortDateString();
-		controlBlock.Type += $"/№{controlBlock.Number}";
-		await ControlBlockService.CreateControlBlock(controlBlock);
-		NavigationManager.NavigateTo("/controlblocksview");
+		_controlBlock.ShippingDate = _shippingDateTime.ToShortDateString();
+		_controlBlock.Type += $"/№{_controlBlock.Number}";
+		await ControlBlockService.Create(_controlBlock);
+		ToPreviousPage();
 	}
 
-	private void BackButtonClick()
+	private void ToPreviousPage()
 	{
 		NavigationManager.NavigateTo("/controlblocksview");
 	}

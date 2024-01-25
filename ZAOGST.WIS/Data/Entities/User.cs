@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-
-namespace ZAOGST.WIS.Data.Entities;
+﻿namespace ZAOGST.WIS.Data.Entities;
 
 public class User : BaseEntity
 {
@@ -11,12 +9,8 @@ public class User : BaseEntity
 
 public class UserValidator : AbstractValidator<User>
 {
-	private readonly DataContext _context;
-
-	public UserValidator(DataContext context)
+	public UserValidator()
 	{
-		_context = context;
-
 		RuleFor(u => u.Username).NotEmpty().WithMessage("Поле не должно быть пустым");
 		RuleFor(u => u.Password).NotEmpty().WithMessage("Поле не должно быть пустым");
 		RuleFor(u => u.Role).NotEmpty().WithMessage("Поле не должно быть пустым");
@@ -28,7 +22,7 @@ public class UserRoles
 	public const string Admin = "Администратор";
 	public const string Employee = "Сотрудник";
 
-	public static List<string> GetList() => new()
+	public static readonly ImmutableArray<string> RolesList = new()
 	{
 		Admin, Employee
 	};

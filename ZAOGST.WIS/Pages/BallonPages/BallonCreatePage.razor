@@ -1,6 +1,9 @@
 ﻿@page "/balloncreate"
+@attribute [Authorize]
 @inject IBallonService BallonService
 @inject NavigationManager NavigationManager
+
+<PageTitle>Новый баллон</PageTitle>
 
 <h4>Добавить новый баллон</h4>
 
@@ -25,20 +28,20 @@
 	<br />
 	<br />
 	<button type="submit" class="btn btn-success">Добавить</button>
-	<button @onclick=BackButtonClick type="button" class="btn btn-secondary">Назад</button>
+	<button @onclick=ToPreviousPage type="button" class="btn btn-secondary">Назад</button>
 </EditForm>
 
 @code {
 	private Ballon _ballon = new();
-	private List<string> _ballonNumbers = BallonNumbers.GetBallonTypes();
+	private List<string> _ballonNumbers = BallonNumbers.NumbersList.ToList();
 
 	private async Task HandleSubmit()
 	{
-		await BallonService.CreateBallon(_ballon);
-		NavigationManager.NavigateTo("/ballonsview");
+		await BallonService.Create(_ballon);
+		ToPreviousPage();
 	}
 
-	private void BackButtonClick()
+	private void ToPreviousPage()
 	{
 		NavigationManager.NavigateTo("/ballonsview");
 	}

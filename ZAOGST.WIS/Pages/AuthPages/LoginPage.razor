@@ -1,10 +1,12 @@
 ﻿@page "/login"
-@inject HttpClient Http
-@inject AuthenticationStateProvider AuthStateProvider
-@inject ILocalStorageService LocalStorageService
 @inject IJSRuntime JsRuntime
-@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService
 @inject IUserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Вход</PageTitle>
 
 <h3>Вход</h3>
 
@@ -15,22 +17,22 @@
 			<br />
 			<br />
 		</div>
-		<EditForm Model="@user" OnValidSubmit=Authenticate class="custom-form">
+		<EditForm Model="@_user" OnValidSubmit=HandleSubmit class="custom-form">
 			<FluentValidationValidator />
 			<div class="user-box">
-				<InputText @bind-Value="@user.Username" class="custom-input" />
+				<InputText @bind-Value="@_user.Username" class="custom-input" />
 				<label class="custom-label">Имя пользователя</label>
-				<ValidationMessage For="() => user.Username" />
+				<ValidationMessage For="() => _user.Username" />
 			</div>
 			<div class="user-box">
-				<InputText @bind-Value="@user.Password" type="password" class="custom-input" />
+				<InputText @bind-Value="@_user.Password" type="password" class="custom-input" />
 				<label class="custom-label">Пароль</label>
-				<ValidationMessage For="() => user.Password" />
+				<ValidationMessage For="() => _user.Password" />
 			</div>
 			<div class="user-box">
 				<InputText @bind-Value="@_passwordConfirmation" type="password" class="custom-input" />
 				<label class="custom-label">Подтвердите пароль</label>
-				<ValidationMessage For="() => user.Password" />
+				<ValidationMessage For="() => _user.Password" />
 			</div>
 			<span class="custom-span">
 				<button type="submit">Войти</button>
@@ -45,60 +47,34 @@
 	</div>
 </div>
 
-@* <EditForm Model="@user" OnValidSubmit="HandleSubmit">
-	<div class="txt_field">
-		<InputText @bind-Value="user.Username" class="input-text"></InputText>
-		<span></span>
-		<label for="username">Имя</label>
-	</div>
-
-	<div class="txt_field">
-		<InputText id="password" type="password" @bind-Value="user.Password" class="input-text"></InputText>
-		<span></span>
-		<label for="password">Пароль</label>
-	</div>
-	<br />
-	<button type="submit" class="m-1 btn btn-primary">Войти</button>
-</EditForm> *@
-
 @code {
-	UserLoginDto user = new();
+	private User _user = new();
 	private string _passwordConfirmation = string.Empty;
 
-	private async Task Authenticate()
+	private async Task HandleSubmit()
 	{
-		User? userEntity = await UserService.GetByUsername(user.Username);
+		User? userEntity = await UserService.GetByUsername(_user.Username);
 
-		if(userEntity == null || userEntity.Password != user.Password)
+		if (userEntity == null || userEntity.Password != _user.Password)
 		{
 			await JsRuntime.InvokeVoidAsync("alert", "Неверное имя пользователя или пароль.");
 			return;
 		}
 
-		if (user.Password != _passwordConfirmation)
+		if (_user.Password != _passwordConfirmation)
 		{
 			await JsRuntime.InvokeVoidAsync("alert", "Пароли не совпадают.");
 			return;
 		}
 
-		var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+		CustomAuthenticationStateProvider? customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+
 		await customAuthStateProvider.UpdateAuthenticationState(new UserSession
-		{
-			Username = userEntity.Username,
-			Role = userEntity.Role
-		});
+			{
+				Username = userEntity.Username,
+				Role = userEntity.Role
+			});
 
 		NavigationManager.NavigateTo("/", true);
 	}
-
-	// private async Task HandleSubmit()
-	// {
-	// 	string baseUrl = "https://localhost:5200/";
-	// 	HttpResponseMessage result = await Http.PostAsJsonAsync($"{baseUrl}api/auth", user);
-	// 	string token = await result.Content.ReadAsStringAsync();
-	// 	await JsRuntime.InvokeAsync<string>("console.log", token);
-	// 	await LocalStorageService.SetItemAsStringAsync("token", token);
-	// 	await AuthStateProvider.GetAuthenticationStateAsync();
-	// 	NavigationManager.NavigateTo("/shipmentsview");
-	// }
 }

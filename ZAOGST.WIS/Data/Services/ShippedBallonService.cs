@@ -11,7 +11,7 @@ public class ShippedBallonService : IShippedBallonService
 
 	public List<ShippedBallon> ShippedBallons { get; set; } = new();
 
-	public async Task CreateShippedBallon(ShippedBallon shippedBallon)
+	public async Task Create(ShippedBallon shippedBallon)
 	{
 		ShippedBallon dbShippedBallon = new()
 		{
@@ -27,16 +27,14 @@ public class ShippedBallonService : IShippedBallonService
 		await _context.SaveChangesAsync();
 	}
 
-	public async Task DeleteShippedBallon(int id)
+	public async Task Delete(int id)
 	{
 		var dbShippedBallon = await _context.ShippedBallons.FindAsync(id) ?? throw new Exception("Не удалось найти баллон.");
 		_context.ShippedBallons.Remove(dbShippedBallon);
 		await _context.SaveChangesAsync();
 	}
 
-	public int GetLastShippedBallonNumber() => _context.ShippedBallons.Count();
-
-	public async Task<ShippedBallon> GetSingleShippedBallonById(int id)
+	public async Task<ShippedBallon> GetById(int id)
 	{
 		var shippedBallon = await _context.ShippedBallons.FindAsync(id);
 
@@ -44,15 +42,15 @@ public class ShippedBallonService : IShippedBallonService
 		return shippedBallon ?? throw new Exception("Не удалось найти баллон.");
 	}
 
-	public async Task<ShippedBallon> GetSingleShippedBallonByStrainGaugeNumber(int strainGaugeNumber)
+	public async Task<ShippedBallon> GetByStrainGaugeNumber(int strainGaugeNumber)
 	{
 		var shippedBallon = await _context.ShippedBallons.FirstOrDefaultAsync(x => x.StrainGaugeNumber == strainGaugeNumber);
 		return shippedBallon;
 	}
 
-	public async Task LoadShippedBallon() => ShippedBallons = await _context.ShippedBallons.AsNoTracking().ToListAsync();
+	public async Task Load() => ShippedBallons = await _context.ShippedBallons.AsNoTracking().ToListAsync();
 
-	public async Task UpdateShippedBallon(ShippedBallon shippedBallon, int id)
+	public async Task Update(ShippedBallon shippedBallon, int id)
 	{
 		var dbShippedBallon = await _context.ShippedBallons.FindAsync(id) ?? throw new Exception("Не удалось найти баллон.");
 

@@ -50,7 +50,7 @@ public class BallonNumbers
 	public const string B6_200 = "B6-200(2K)";
 	public const string B7_200 = "B7-200(2K)";
 
-	public static List<string> GetBallonTypes() => new()
+	public static readonly ImmutableArray<string> NumbersList = new()
 	{
 		NONE,
 		B1_90,

@@ -16,37 +16,24 @@ public class ControlBlockValidator : AbstractValidator<ControlBlock>
 	{
 		_context = context;
 
-		RuleFor(n => n.Number).Must(IsNotNegative).WithMessage("Номер блока не может быть отрицательным или нулём");
+		RuleFor(n => n.Number).Must(IsNotNegativeNumber).WithMessage("Номер блока не может быть отрицательным или нулём");
 		RuleFor(n => n.Number).NotEmpty().WithMessage("Поле не должно быть пустым");
 		RuleFor(n => n.Number).Must(IsUniqueNumber).WithMessage("Блок управления с этим номером уже существует");
-		//RuleFor(n => n.Ballons).Must(IsUniqueBallonsList).WithMessage("Этот баллон уже занят");
 	}
 
 	private bool IsUniqueNumber(int number)
 	{
-		var exist = _context.ControlBlocks.Where(x => x.Number == number).Any();
+		bool exist = _context.ControlBlocks.Where(x => x.Number == number).Any();
 		return exist == false;
 	}
 
-	private bool IsNotNegative(int number)
+	private bool IsNotNegativeNumber(int number)
 	{
-		if (number <= 0) return false;
-		else return true;
+		if (number <= 0)
+			return false;
+		else
+			return true;
 	}
-
-	//TODO: Make this below
-	//private bool IsUniqueBallonsList(ICollection<Ballon>? ballons)
-	//{
-	//	var ballon = _context.Ballons.FirstOrDefault(x => x.ControlBlock != null && x.ControlBlock != null);
-
-	//	if (ballons == null || ballons.Count < 1 || ballon == null)
-	//		return true;
-
-	//	if (ballons.Contains(ballon.Id))
-	//		return false;
-
-	//	return true;
-	//}
 }
 
 public class ControlBlockTypes
@@ -55,7 +42,7 @@ public class ControlBlockTypes
 	public const string TYPE130 = "СКП2.00.54.200-01 (130)";
 	public const string TYPE200 = "СКП2.00.54.200-02 (200)";
 
-	public static List<string> GetTypesValueList() => new()
+	public static readonly ImmutableArray<string> TypesList = new()
 	{
 		TYPE130, TYPE200, TYPE90
 	};

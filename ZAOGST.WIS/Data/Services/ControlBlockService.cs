@@ -12,7 +12,7 @@ public class ControlBlockService : IControlBlockService
 
 	public List<ControlBlock> ControlBlocks { get; set; } = new();
 
-	public async Task<ControlBlock?> CreateControlBlock(ControlBlock controlBlock)
+	public async Task<ControlBlock?> Create(ControlBlock controlBlock)
 	{
 		ControlBlock dbControlBlock = new()
 		{
@@ -35,14 +35,14 @@ public class ControlBlockService : IControlBlockService
 	//	await _context.SaveChangesAsync();
 	//}
 
-	public async Task DeleteControlBlock(int id)
+	public async Task Delete(int id)
 	{
 		var dbControlBlock = await _context.ControlBlocks.FindAsync(id) ?? throw new Exception("Не удалось найти блок управления.");
 		_context.ControlBlocks.Remove(dbControlBlock);
 		await _context.SaveChangesAsync();
 	}
 
-	public async Task<int> GetLastControlBlockNumber()
+	public async Task<int> GetLastNumber()
 	{
 		List<ControlBlock> controlBlocksList = await _context.ControlBlocks.ToListAsync();
 
@@ -57,16 +57,7 @@ public class ControlBlockService : IControlBlockService
 		return lastControlBlock.Number;
 	}
 
-	public async Task<int> GetLastControlBlockCountNumber()
-	{
-		ControlBlock? controlBlock = await _context.ControlBlocks.OrderByDescending(x => x.Number).FirstOrDefaultAsync();
-
-		if (controlBlock == null) return 0;
-
-		return controlBlock.Number;
-	}
-
-	public async Task<ControlBlock> GetSingleControlBlock(int id)
+	public async Task<ControlBlock> GetById(int id)
 	{
 		var controlBlock = await _context.ControlBlocks.Include("Ballons").FirstOrDefaultAsync(cb => cb.Id == id);
 
@@ -74,9 +65,9 @@ public class ControlBlockService : IControlBlockService
 		return controlBlock ?? throw new Exception("Не удалось найти блок управления.");
 	}
 
-	public async Task LoadControlBlock() => ControlBlocks = await _context.ControlBlocks.AsNoTracking().ToListAsync();
+	public async Task Load() => ControlBlocks = await _context.ControlBlocks.AsNoTracking().ToListAsync();
 
-	public async Task UpdateControlBlock(ControlBlock controlBlock)
+	public async Task Update(ControlBlock controlBlock)
 	{
 		var dbControlBlock = await _context.ControlBlocks.Where(cb => cb.Id == controlBlock.Id).SingleOrDefaultAsync() ?? throw new Exception("Не удалось найти блок управления.");
 

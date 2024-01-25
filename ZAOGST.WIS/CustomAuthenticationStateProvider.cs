@@ -1,20 +1,11 @@
-﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-
-namespace ZAOGST.WIS;
+﻿namespace ZAOGST.WIS;
 
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
-	private readonly ILocalStorageService _localService;
 	private readonly ProtectedSessionStorage _sessionStorage;
-	private ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
-	private readonly HttpClient _http;
+	private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
 
-	public CustomAuthenticationStateProvider(ILocalStorageService localService, ProtectedSessionStorage sessionStorage, HttpClient http)
-	{
-		_localService = localService;
-		_sessionStorage = sessionStorage;
-		_http = http;
-	}
+	public CustomAuthenticationStateProvider(ProtectedSessionStorage sessionStorage) => _sessionStorage = sessionStorage;
 
 	public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 	{
@@ -38,39 +29,13 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 		{
 			return await Task.FromResult(new AuthenticationState(_anonymous));
 		}
-
-		//string token = string.Empty;
-
-		//try
-		//{
-		//	token = await _localService.GetItemAsStringAsync("token") ?? string.Empty;
-		//}
-		//catch (InvalidOperationException)
-		//{
-		//}
-
-		//ClaimsIdentity identity = new();
-		//_http.DefaultRequestHeaders.Authorization = null;
-
-		//if (!string.IsNullOrEmpty(token))
-		//{
-		//	identity = new(ParseClaimsFromJwt(token), "jwt");
-		//	_http.DefaultRequestHeaders.Authorization = new("Bearer", token.Replace("\"", ""));
-		//}
-
-		//ClaimsPrincipal user = new(identity);
-		//AuthenticationState state = new(user);
-
-		//NotifyAuthenticationStateChanged(Task.FromResult(state));
-
-		//return state;
 	}
 
 	public async Task UpdateAuthenticationState(UserSession userSession)
 	{
 		ClaimsPrincipal claimsPrincipal;
 
-		if(userSession != null)
+		if (userSession != null)
 		{
 			await _sessionStorage.SetAsync("UserSession", userSession);
 

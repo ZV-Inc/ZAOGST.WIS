@@ -3,13 +3,11 @@
 public interface IControlBlockService
 {
 	List<ControlBlock> ControlBlocks { get; set; }
-	Task LoadControlBlock();
-	Task<ControlBlock> GetSingleControlBlock(int id);
-	Task<ControlBlock?> CreateControlBlock(ControlBlock controlBlock);
-	//Task CreateControlBlock(ControlBlock controlBlock);
-	Task UpdateControlBlock(ControlBlock controlBlock);
-	Task DeleteControlBlock(int id);
-	Task<int> GetLastControlBlockNumber();
+	Task Load();
+	Task<ControlBlock> GetById(int id);
+	Task<ControlBlock?> Create(ControlBlock controlBlock);
+	Task Update(ControlBlock controlBlock);
+	Task Delete(int id);
+	Task<int> GetLastNumber();
 	Task<List<Ballon>?> GetBallonsList(int id);
-	Task<int> GetLastControlBlockCountNumber();
 }

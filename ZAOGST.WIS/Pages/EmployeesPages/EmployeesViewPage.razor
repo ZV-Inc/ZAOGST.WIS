@@ -1,8 +1,8 @@
 ﻿@page "/employeesview"
+@attribute [Authorize(Roles = UserRoles.Admin)]
 @inject IJSRuntime JsRuntime
 @inject IUserService UserService
 @inject NavigationManager NavigationManager
-@attribute [Authorize(Roles = UserRoles.Admin)]
 
 <PageTitle>Сотрудники</PageTitle>
 
@@ -22,13 +22,13 @@
 
 @code {
 	private User _user = new();
-	private List<User> _userData;
+	private List<User> _userData = new();
 	private Random _random = new();
 
 	protected override async Task OnInitializedAsync()
 	{
 		await UserService.Load();
-		_userData = UserService.Users.OrderBy(x=>x.Id).ToList();
+		_userData = UserService.Users.OrderBy(x => x.Id).ToList();
 	}
 
 	private void RowClick(User user)

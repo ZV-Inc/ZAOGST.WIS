@@ -1,7 +1,6 @@
 ﻿@page "/ballonsview"
 @attribute [Authorize]
 @inject IBallonService BallonService
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 <PageTitle>Баллоны</PageTitle>
@@ -33,10 +32,7 @@ else
 
 @code {
 	private bool _isLoading { get; set; } = false;
-	private Ballon _ballon = new();
-	private Ballon[]? _ballonData;
-	private Ballon? _selectedBallon;
-	private Random _random = new();
+	private List<Ballon>? _ballonData = new();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -45,19 +41,12 @@ else
 
 	private async void LoadBallonsData()
 	{
-		await BallonService.Load();
-		_ballonData = BallonService.Ballons.ToArray();
+		_ballonData = await BallonService.GetList();
 	}
 
 	private void RowClick(Ballon ballon)
 	{
-		_selectedBallon = ballon;
-		ShowBallon(_selectedBallon.Id);
-	}
-
-	private void ShowBallon(int id)
-	{
-		NavigationManager.NavigateTo($"/ballonupdate/{id}");
+		NavigationManager.NavigateTo($"/ballonupdate/{ballon.Id}");
 	}
 
 	private void CreateNewBallon()

@@ -4,27 +4,7 @@ public class BallonService : IBallonService
 {
 	private readonly DataContext _context;
 
-	public BallonService(DataContext context)
-	{
-		_context = context;
-	}
-
-	public List<Ballon> Ballons { get; set; } = new();
-
-	public async Task Load() => Ballons = await _context.Ballons.AsNoTracking().ToListAsync();
-
-	public async Task<Ballon> GetById(int id)
-	{
-		var ballon = await _context.Ballons.FindAsync(id);
-
-		return ballon ?? throw new BallonNotFoundException();
-	}
-
-	public async Task<Ballon> GetByStrainGaugeNumber(int strainGaugeNumber)
-	{
-		var ballon = await _context.Ballons.FirstOrDefaultAsync(x => x.StrainGaugeNumber == strainGaugeNumber) ?? throw new BallonNotFoundException();
-		return ballon;
-	}
+	public BallonService(DataContext context) => _context = context;
 
 	public async Task Create(Ballon ballon)
 	{
@@ -50,4 +30,8 @@ public class BallonService : IBallonService
 		_context.Ballons.Remove(dbBallon);
 		await _context.SaveChangesAsync();
 	}
+
+	public async Task<Ballon> GetById(int id) => await _context.Ballons.FindAsync(id) ?? throw new BallonNotFoundException();
+
+	public async Task<List<Ballon>> GetList() => await _context.Ballons.AsNoTracking().ToListAsync();
 }

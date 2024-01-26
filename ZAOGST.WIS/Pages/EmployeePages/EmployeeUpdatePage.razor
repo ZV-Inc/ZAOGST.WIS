@@ -52,18 +52,9 @@
 
 	private async void HandleSubmit()
 	{
-		User oldUser = await UserService.GetById(Id);
-
-		if (_user.Username == oldUser.Username && _user.Password == oldUser.Password && _user.Role == oldUser.Role)
-		{
-			ToPreviousPage();
-		}
-		else
-		{
-			_user.DateUpdated = DateTime.Now;
-			await UserService.Update(_user);
-			ToPreviousPage();
-		}
+		_user.DateUpdated = DateTime.Now;
+		await UserService.Update(_user);
+		ToPreviousPage();
 	}
 
 	private async void DeleteButtonClick()
@@ -79,6 +70,6 @@
 
 	private void ToPreviousPage()
 	{
-		NavigationManager.NavigateTo("/employeesview");
+		NavigationManager.NavigateTo("/employeesview", true);
 	}
 }

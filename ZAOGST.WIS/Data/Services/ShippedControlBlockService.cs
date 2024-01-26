@@ -4,15 +4,9 @@ public class ShippedControlBlockService : IShippedControlBlockService
 {
 	private readonly DataContext _context;
 
-	public ShippedControlBlockService(DataContext context)
-	{
-		_context = context;
-		_context.Database.EnsureCreated();
-	}
+	public ShippedControlBlockService(DataContext context) => _context = context;
 
-	public List<ShippedControlBlock> ShippedControlBlocks { get; set; } = new();
-
-	public async Task<ShippedControlBlock?> Create(ShippedControlBlock shippedControlBlock)
+	public async Task<ShippedControlBlock> Create(ShippedControlBlock shippedControlBlock)
 	{
 		ShippedControlBlock dbShippedControlBlock = new()
 		{
@@ -26,14 +20,23 @@ public class ShippedControlBlockService : IShippedControlBlockService
 
 		await _context.SaveChangesAsync();
 
-		return await _context.ShippedControlBlocks.FirstOrDefaultAsync(x => x.Id == dbShippedControlBlock.Id);
-		//_context.ShippedControlBlocks.Add(shipment);
-		//await _context.SaveChangesAsync();
+		return await _context.ShippedControlBlocks.FirstOrDefaultAsync(x => x.Id == dbShippedControlBlock.Id) ?? throw new ShippedControlBlockNotFoundException();
 	}
 
-	public async Task Delete(int id)
+	public async Task Update(ShippedControlBlock shippedControlBlock)
 	{
-		var dbShippedControlBlock = await _context.ShippedControlBlocks.Include("ShippedBallons").FirstOrDefaultAsync(scb => scb.Id == id) ?? throw new Exception("Не удалось найти блок управления.");
+		var dbShippedControlBlock = await _context.ShippedControlBlocks.Include("ShippedBallons").FirstOrDefaultAsync(scb => scb.Id == shippedControlBlock.Id) ?? throw new ShippedControlBlockNotFoundException();
+
+		dbShippedControlBlock.Number = shippedControlBlock.Number;
+		dbShippedControlBlock.Type = shippedControlBlock.Type;
+		dbShippedControlBlock.IsSended = shippedControlBlock.IsSended;
+
+		await _context.SaveChangesAsync();
+	}
+
+	public async Task Delete(ShippedControlBlock shippedControlBlock)
+	{
+		var dbShippedControlBlock = await _context.ShippedControlBlocks.Include("ShippedBallons").FirstOrDefaultAsync(scb => scb.Id == shippedControlBlock.Id) ?? throw new ShippedControlBlockNotFoundException();
 
 		if (dbShippedControlBlock.ShippedBallons != null && dbShippedControlBlock.ShippedBallons.Count > 0)
 			foreach (ShippedBallon shippedBallon in dbShippedControlBlock.ShippedBallons)
@@ -44,27 +47,11 @@ public class ShippedControlBlockService : IShippedControlBlockService
 		await _context.SaveChangesAsync();
 	}
 
-	public async Task<ShippedControlBlock> GetById(int id)
-	{
-		var shipment = await _context.ShippedControlBlocks.Include("ShippedBallons").FirstOrDefaultAsync(scb => scb.Id == id);
+	public async Task<ShippedControlBlock> GetById(int id) => await _context.ShippedControlBlocks.Include("ShippedBallons").FirstOrDefaultAsync(scb => scb.Id == id) ?? throw new ShippedControlBlockNotFoundException();
 
-		//TODO: Сделать кастомные исключения
-		return shipment ?? throw new Exception("Не удалось найти блок управления.");
-	}
+	public async Task<List<ShippedControlBlock>> GetList() => await _context.ShippedControlBlocks.AsNoTracking().Include("ShippedBallons").ToListAsync();
 
-	public async Task Load()
-	{
-		ShippedControlBlocks = await _context.ShippedControlBlocks.AsNoTracking().Include("ShippedBallons").ToListAsync();
-	}
+	public async Task<List<ShippedControlBlock>> GetSended() => await _context.ShippedControlBlocks.Where(x => x.IsSended).ToListAsync();
 
-	public async Task Update(ShippedControlBlock shipment/*, int id*/)
-	{
-		//var dbShipment = await _context.ShippedControlBlocks.Include("ShippedBallons").FirstOrDefaultAsync(scb => scb.Id == id) ?? throw new Exception("Не удалось найти блок управления.");
-		var dbShipment = await _context.ShippedControlBlocks.Include("ShippedBallons").FirstOrDefaultAsync(scb => scb.Id == shipment.Id) ?? throw new Exception("Не удалось найти блок управления.");
-
-		dbShipment.Number = shipment.Number;
-		dbShipment.Type = shipment.Type;
-
-		await _context.SaveChangesAsync();
-	}
+	public async Task<List<ShippedControlBlock>> GetNotSended() => await _context.ShippedControlBlocks.Where(x => !x.IsSended).ToListAsync();
 }

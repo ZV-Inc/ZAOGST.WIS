@@ -1,6 +1,5 @@
 ﻿@page "/employeesview"
 @attribute [Authorize(Roles = UserRoles.Admin)]
-@inject IJSRuntime JsRuntime
 @inject IUserService UserService
 @inject NavigationManager NavigationManager
 
@@ -21,14 +20,13 @@
 </Table>
 
 @code {
-	private User _user = new();
 	private List<User> _userData = new();
-	private Random _random = new();
 
 	protected override async Task OnInitializedAsync()
 	{
-		await UserService.Load();
-		_userData = UserService.Users.OrderBy(x => x.Id).ToList();
+		List<User> list = await UserService.GetList();
+
+		_userData = list.OrderBy(x => x.Id).ToList();
 	}
 
 	private void RowClick(User user)

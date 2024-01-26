@@ -1,7 +1,6 @@
 ﻿@page "/controlblocksview"
 @attribute [Authorize]
 @inject IControlBlockService ControlBlockService
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 <PageTitle>Блоки управления</PageTitle>
@@ -30,9 +29,7 @@ else
 }
 
 @code {
-	private ControlBlock _controlBlock = new();
 	private List<ControlBlock>? _controlBlockData = new();
-	private Random _random = new();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -41,18 +38,14 @@ else
 
 	private async void LoadControlBlocksData()
 	{
-		await ControlBlockService.Load(); //TODO: Переработать это непонятно что
-		_controlBlockData = ControlBlockService.ControlBlocks.OrderBy(x => x.Id).ToList();
+		List<ControlBlock> list = await ControlBlockService.GetList();
+
+		_controlBlockData = list.OrderBy(x => x.Id).ToList();
 	}
 
 	private void RowClick(ControlBlock controlBlock)
 	{
-		ShowControlBlock(controlBlock.Id);
-	}
-
-	private void ShowControlBlock(int id)
-	{
-		NavigationManager.NavigateTo($"/controlblockupdate/{id}");
+		NavigationManager.NavigateTo($"/controlblockupdate/{controlBlock.Id}");
 	}
 
 	private void CreateNewControlBlock()
@@ -60,19 +53,21 @@ else
 		NavigationManager.NavigateTo("/controlblockcreate");
 	}
 
-	private async void CreateRandomControlBlock()
-	{
-		Random random = new();
-		int lastControlBlockNumber = await ControlBlockService.GetLastNumber();
+	#region ONLY FOR DEV BUILD
+	// private async void CreateRandomControlBlock()
+	// {
+	// 	Random random = new();
+	// 	int lastControlBlockNumber = await ControlBlockService.GetLastNumber();
 
-		ControlBlock newControlBlock = new()
-			{
-				Number = lastControlBlockNumber + 1,
-				Type = $"{ControlBlockTypes.TypesList.ToList()[_random.Next(0, 3)]}/№{lastControlBlockNumber + 1}",
-				ShippingDate = DateTime.Now.AddDays(random.Next(1, 60)).ToShortDateString(),
-			};
+	// 	ControlBlock newControlBlock = new()
+	// 		{
+	// 			Number = lastControlBlockNumber + 1,
+	// 			Type = $"{ControlBlockTypes.TypesList.ToList()[_random.Next(0, 3)]}/№{lastControlBlockNumber + 1}",
+	// 			ShippingDate = DateTime.Now.AddDays(random.Next(1, 60)).ToShortDateString(),
+	// 		};
 
-		await ControlBlockService.Create(newControlBlock);
-		NavigationManager.NavigateTo("/controlblocksview", true);
-	}
+	// 	await ControlBlockService.Create(newControlBlock);
+	// 	NavigationManager.NavigateTo("/controlblocksview", true);
+	// }
+	#endregion
 }

@@ -1,9 +1,7 @@
 ﻿@page "/login"
 @inject IJSRuntime JsRuntime
-@inject ILocalStorageService LocalStorageService
 @inject IUserService UserService
 @inject AuthenticationStateProvider AuthStateProvider
-@inject HttpClient Http
 @inject NavigationManager NavigationManager
 
 <PageTitle>Вход</PageTitle>
@@ -13,7 +11,7 @@
 <div class="custom-body">
 	<div class="custom-container">
 		<div class="logo">
-			<img width="250px" src="img/Logo-GST_Centr.png" />
+			<img width="250" src="img/Logo-GST_Centr.png" />
 			<br />
 			<br />
 		</div>

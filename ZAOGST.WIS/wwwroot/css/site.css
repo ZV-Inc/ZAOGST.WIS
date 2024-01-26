@@ -208,3 +208,10 @@ a, .btn-link {
         text-decoration: none;
         color: indigo;
     }
+
+.my-info-div {
+    padding: 10px 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid gray;
+}

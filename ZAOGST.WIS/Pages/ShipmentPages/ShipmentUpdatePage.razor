@@ -11,23 +11,54 @@
 	<PageTitle>Просмотр блока №@_shippedControlBlock.Number</PageTitle>
 
 	<h3>Просмотр блока №@_shippedControlBlock.Number</h3>
-	<p class="p-1">Тип: @_shippedControlBlock.Type</p>
-	<p class="p-1">Дата отгрузки: @_shippedControlBlock.ShippingDate</p>
-	<p class="p-1">Баллоны:</p>
-	@foreach (var ballon in _shippedControlBlock.ShippedBallons.OrderBy(x => x.BallonNumber))
-	{
-		<p class="p-1">№@ballon.StrainGaugeNumber | @ballon.BallonNumber (Дата отгрузки: @ballon.ShippingDate)</p>
-	}
+	<div class="my-adaptive-div my-info-div">
+		<h6 class="mt-1">Тип: @_shippedControlBlock.Type</h6>
+		<h6 class="mt-1">Дата отгрузки: @_shippedControlBlock.ShippingDate</h6>
+		@if (_shippedControlBlock.IsSended)
+		{
+			<h6 class="mt-1">Отправлено: Да</h6>
+		}
+		else
+		{
+			<h6 class="mt-1">Отправлено: Нет</h6>
+		}
+	</div>
+	<br />
+	<div class="my-adaptive-div my-info-div">
+		<h5 class="p-1">Баллоны:</h5>
+		@foreach (var ballon in _shippedControlBlock.ShippedBallons.OrderBy(x => x.StrainGaugeNumber))
+		{
+			<p class="p-1">№@ballon.StrainGaugeNumber | @ballon.BallonNumber (Дата отгрузки: @ballon.ShippingDate)</p>
+		}
+	</div>
 	<br />
 	<br />
 	<AuthorizeView>
 		<Authorized>
-			<button class="btn btn-primary" @onclick=ReturnToWarehouse>Вернуть на склад</button>
-			<button class="btn btn-danger" @onclick="DeleteCurrentShipmentBlock">Удалить</button>
-			<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
+			@if (_shippedControlBlock.IsSended)
+			{
+				<button class="btn btn-primary" @onclick=ReturnToShipment>Вернуть "На отгрузку"</button>
+				<button class="btn btn-danger" @onclick="DeleteCurrentShipmentBlock">Удалить</button>
+				<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
+			}
+			else
+			{
+				<button class="btn btn-primary" @onclick=ReturnToWarehouse>Вернуть на склад</button>
+				<button class="btn btn-outline-secondary" @onclick=Sended>Отправлено</button>
+				<button class="btn btn-danger" @onclick="DeleteCurrentShipmentBlock">Удалить</button>
+				<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
+			}
 		</Authorized>
 		<NotAuthorized>
-			<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
+			@if (_shippedControlBlock.IsSended)
+			{
+				<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
+			}
+			else
+			{
+				<button class="btn btn-outline-secondary" @onclick=Sended>Отправлено</button>
+				<button class="btn btn-secondary" @onclick="ToPreviousPage">Назад</button>
+			}
 		</NotAuthorized>
 	</AuthorizeView>
 	<br />
@@ -51,9 +82,27 @@
 
 		if (confirmed)
 		{
-			await ShippedControlBlockService.Delete(_shippedControlBlock.Id);
+			await ShippedControlBlockService.Delete(_shippedControlBlock);
 			ToPreviousPage();
 		}
+	}
+
+	private async void Sended()
+	{
+		_shippedControlBlock.IsSended = true;
+
+		await ShippedControlBlockService.Update(_shippedControlBlock);
+
+		ToPreviousPage();
+	}
+
+	private async void ReturnToShipment()
+	{
+		_shippedControlBlock.IsSended = false;
+
+		await ShippedControlBlockService.Update(_shippedControlBlock);
+
+		ToPreviousPage();
 	}
 
 	private async void ReturnToWarehouse()
@@ -96,7 +145,7 @@
 
 		await ControlBlockService.Update(newControlBlock);
 
-		await ShippedControlBlockService.Delete(_shippedControlBlock.Id);
+		await ShippedControlBlockService.Delete(_shippedControlBlock);
 
 		ToPreviousPage();
 	}

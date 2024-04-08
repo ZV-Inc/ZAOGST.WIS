@@ -62,7 +62,7 @@
 		}
 		else
 		{
-			_ballon.DateUpdated = DateTime.Now;
+			_ballon.DateUpdated = DateTimeConverter.GetNowUTC5();
 			await BallonService.Update(_ballon);
 			ToPreviousPage();
 		}

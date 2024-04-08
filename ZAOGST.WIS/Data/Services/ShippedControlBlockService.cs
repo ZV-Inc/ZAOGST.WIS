@@ -30,6 +30,7 @@ public class ShippedControlBlockService : IShippedControlBlockService
 		dbShippedControlBlock.Number = shippedControlBlock.Number;
 		dbShippedControlBlock.Type = shippedControlBlock.Type;
 		dbShippedControlBlock.IsSended = shippedControlBlock.IsSended;
+		dbShippedControlBlock.DateUpdated = shippedControlBlock.DateUpdated;
 
 		await _context.SaveChangesAsync();
 	}

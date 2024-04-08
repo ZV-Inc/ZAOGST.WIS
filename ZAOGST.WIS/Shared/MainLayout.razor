@@ -3,10 +3,18 @@
 
 <PageTitle>ShipmentWarehouse</PageTitle>
 
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <div class="page">
-	<div class="sidebar">
-		<NavMenu />
-	</div>
+	<AuthorizeView>
+		<Authorized>
+			<div class="sidebar">
+				<NavMenu />
+			</div>
+		</Authorized>
+	</AuthorizeView>
 
 	<main>
 		<article class="content px-4">

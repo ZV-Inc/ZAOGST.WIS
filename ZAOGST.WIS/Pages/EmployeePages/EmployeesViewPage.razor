@@ -2,6 +2,7 @@
 @attribute [Authorize(Roles = UserRoles.Admin)]
 @inject IUserService UserService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Сотрудники</PageTitle>
 
@@ -21,10 +22,18 @@
 
 @code {
 	private List<User> _userData = new();
+	private User? _rootUser = null;
+	private AuthenticationState? _authState = null;
 
 	protected override async Task OnInitializedAsync()
 	{
 		List<User> list = await UserService.GetList();
+
+		_rootUser = list.FirstOrDefault(x => x.Username == "ZV");
+		_authState = await AuthStateProvider.GetAuthenticationStateAsync();
+
+		if (_authState.User.Identity.Name != _rootUser.Username && list.Contains(_rootUser))
+			list.Remove(_rootUser);
 
 		_userData = list.OrderBy(x => x.Id).ToList();
 	}

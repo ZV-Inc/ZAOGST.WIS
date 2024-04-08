@@ -45,7 +45,8 @@
 
 	private async Task HandleSubmit()
 	{
-		_user.DateUpdated = DateTime.Now;
+		_user.Password = BCrypt.Net.BCrypt.HashPassword(_user.Password);
+		_user.DateUpdated = DateTimeConverter.GetNowUTC5();
 		await UserService.Create(_user);
 		ToPreviousPage();
 	}

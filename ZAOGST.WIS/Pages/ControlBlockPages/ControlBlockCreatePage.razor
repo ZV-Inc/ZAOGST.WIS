@@ -1,0 +1,59 @@
+﻿@page "/controlblockcreate"
+@attribute [Authorize]
+@inject IControlBlockService ControlBlockService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Новый блок управления</PageTitle>
+
+<h4>Добавить новый блок управления</h4>
+
+<EditForm Model="@_controlBlock" OnValidSubmit="HandleSubmit">
+	<FluentValidationValidator />
+	<div class="form-group my-adaptive-div">
+		<label for="number" class="col-form-label">Номер блока управления</label>
+		<InputNumber id="number" type="number" @bind-Value="_controlBlock.Number" class="form-control" placeholder="Номер блока управления"></InputNumber>
+		<ValidationMessage For="() => _controlBlock.Number" />
+	</div>
+	<div class="form-group my-adaptive-div">
+		<label for="build">Номер сборки</label>
+		<InputSelect class="form-select form-control" @bind-Value="_controlBlock.Type">
+			@foreach (var type in _controlBlockTypes)
+			{
+				<option value="@type">@type</option>
+			}
+		</InputSelect>
+		<ValidationMessage For="() => _controlBlock.Type" />
+	</div>
+	<div class="form-group my-adaptive-div">
+		<label for="date" class="col-sm-2 col-form-label">Дата отгрузки</label>
+		<InputDate id="date" @bind-Value="_shippingDateTime" class="form-control" />
+	</div>
+	<br />
+	<button type="submit" class="btn btn-success">Добавить</button>
+	<button @onclick=ToPreviousPage type="button" class="btn btn-secondary">Назад</button>
+</EditForm>
+
+@code {
+	private ControlBlock _controlBlock = new();
+	private List<string> _controlBlockTypes = new();
+	private DateTime _shippingDateTime = DateTime.Now;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_controlBlockTypes = ControlBlockTypes.TypesList.ToList();
+		_controlBlock.Number += await ControlBlockService.GetLastNumber() + 1;
+	}
+
+	private async Task HandleSubmit()
+	{
+		_controlBlock.ShippingDate = _shippingDateTime.ToShortDateString();
+		_controlBlock.Type += $"/№{_controlBlock.Number}";
+		await ControlBlockService.Create(_controlBlock);
+		ToPreviousPage();
+	}
+
+	private void ToPreviousPage()
+	{
+		NavigationManager.NavigateTo("/controlblocksview");
+	}
+}

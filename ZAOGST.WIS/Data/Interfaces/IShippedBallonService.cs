@@ -2,12 +2,10 @@
 
 public interface IShippedBallonService
 {
-	List<ShippedBallon> ShippedBallons { get; set; }
-	Task LoadShippedBallon();
-	Task<ShippedBallon> GetSingleShippedBallonById(int id);
-	Task<ShippedBallon> GetSingleShippedBallonByStrainGaugeNumber(int strainGaugeNumber);
-	Task CreateShippedBallon(ShippedBallon shippedBallon);
-	Task UpdateShippedBallon(ShippedBallon shippedBallon, int id);
-	Task DeleteShippedBallon(int id);
-	int GetLastShippedBallonNumber();
+	Task Create(ShippedBallon shippedBallon);
+	Task Update(ShippedBallon shippedBallon, int id);
+	Task Delete(int id);
+	Task<ShippedBallon> GetById(int id);
+	Task<ShippedBallon> GetByStrainGaugeNumber(int strainGaugeNumber);
+	Task<List<ShippedBallon>> GetList();
 }

@@ -96,6 +96,10 @@ namespace ZAOGST.WIS.Migrations
                     b.Property<int?>("ShippedControlBlockId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ShippingDate")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("StrainGaugeNumber")
                         .HasColumnType("INTEGER");
 
@@ -118,6 +122,9 @@ namespace ZAOGST.WIS.Migrations
                     b.Property<DateTime>("DateUpdated")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsSended")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Number")
                         .HasColumnType("INTEGER");
 
@@ -132,6 +139,35 @@ namespace ZAOGST.WIS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ShippedControlBlocks");
+                });
+
+            modelBuilder.Entity("ZAOGST.WIS.Data.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("ZAOGST.WIS.Data.Entities.Ballon", b =>

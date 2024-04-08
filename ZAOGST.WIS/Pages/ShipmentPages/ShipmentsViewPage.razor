@@ -14,8 +14,10 @@ else
 	<h3>Блоки управления на отгрузку</h3>
 	<br />
 	<br />
+	<a href="sendedshippedcontrolblocksview">Отправленные блоки</a>
+	<br />
+	<br />
 	<Table TableItem="ShippedControlBlock" Items="_shippedControlBlocksData" PageSize="15" RowClickAction="RowClick" class="table table-striped table-sm table-bordered">
-		@* <Column TableItem="ShippedControlBlock" Title="№ Блока управления" Field="@(x => x.Number)" Sortable="true" Filterable="true" Width="3%" /> *@
 		<Column TableItem="ShippedControlBlock" Title="Тип" Field="@(x => x.Type)" Sortable="true" Filterable="true" Width="10%" />
 		<Column TableItem="ShippedControlBlock" Title="Дата отгрузки" Field="@(x => x.ShippingDate)" Sortable="true" Filterable="true" Width="20%" />
 		<Column TableItem="ShippedControlBlock" Title="Дата добавления" Field="@(x => x.DateAdded)" Sortable="true" Filterable="true" Width="20%" />
@@ -24,48 +26,20 @@ else
 }
 
 @code {
-	private ShippedControlBlock _shippedControlBlock = new();
-	private ShippedControlBlock[] _shippedControlBlocksData;
-	private ShippedControlBlock _selectedShippedControlBlock;
+	private List<ShippedControlBlock>? _shippedControlBlocksData;
 
 	protected override async Task OnInitializedAsync()
 	{
-		await Task.Run(LoadShippedControlBlocksData);
+		await Task.Run(LoadShippedControlBlocksData); //TODO: Приложение падает если на этом этапе пытаться перезагрузиться или перейти на другую страницу
 	}
 
 	private async void LoadShippedControlBlocksData()
 	{
-		await ShippedControlBlockService.LoadShippedControlBlock();
-		_shippedControlBlocksData = ShippedControlBlockService.ShippedControlBlocks.ToArray();
+		_shippedControlBlocksData = await ShippedControlBlockService.GetNotSended();
 	}
 
-	// private async Task DeleteConfirm(int id)
-	// {
-	// 	var system = await EmptySystemService.GetSingleEmptySystem(id);
-	// 	bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены что хотите удалить \"{system.Name}\"?");
-
-	// 	if (confirmed)
-	// 	{
-	// 		await EmptySystemService.DeleteEmptySystem(id);
-	// 		NavigationManager.NavigateTo("controlemptysystems", true);
-	// 	}
-	// }
-
-	private void RowClick(ShippedControlBlock shipment)
+	private void RowClick(ShippedControlBlock shippedControlBlock)
 	{
-		_selectedShippedControlBlock = shipment;
-		// StateHasChanged();
-		ShowShipment(_selectedShippedControlBlock.Id);
-	}
-
-	private void ShowShipment(int id)
-	{
-		NavigationManager.NavigateTo($"/shipmentupdate/{id}");
-	}
-
-	private async void CreateShipment()
-	{
-		NavigationManager.NavigateTo("/shipmentsview");
-		await InvokeAsync(StateHasChanged);
+		NavigationManager.NavigateTo($"/shipmentupdate/{shippedControlBlock.Id}");
 	}
 }

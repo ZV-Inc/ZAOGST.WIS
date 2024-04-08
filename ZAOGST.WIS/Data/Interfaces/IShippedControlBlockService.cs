@@ -2,12 +2,11 @@
 
 public interface IShippedControlBlockService
 {
-	List<ShippedControlBlock> ShippedControlBlocks { get; set; }
-	Task LoadShippedControlBlock();
-	Task<ShippedControlBlock> GetSingleShippedControlBlock(int id);
-	Task<ShippedControlBlock?> CreateShippedControlBlock(ShippedControlBlock shippedControlBlock);
-	Task UpdateShippedControlBlock(ShippedControlBlock shippedControlBlock/*, int id*/);
-	Task DeleteShippedControlBlock(int id);
-	int GetLastShippedControlBlockNumber();
-	Task<int> GetLastShippedControlBlockId();
+	Task<ShippedControlBlock> Create(ShippedControlBlock shippedControlBlock);
+	Task Update(ShippedControlBlock shippedControlBlock);
+	Task Delete(ShippedControlBlock shippedControlBlock);
+	Task<ShippedControlBlock> GetById(int id);
+	Task<List<ShippedControlBlock>> GetList();
+	Task<List<ShippedControlBlock>> GetSended();
+	Task<List<ShippedControlBlock>> GetNotSended();
 }

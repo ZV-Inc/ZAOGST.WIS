@@ -1,0 +1,66 @@
+﻿@page "/login"
+@inject IJSRuntime JsRuntime
+@inject IUserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Вход</PageTitle>
+
+<h3>Вход</h3>
+
+<div class="custom-body">
+	<div class="custom-container">
+		<div class="logo">
+			<img width="250" src="img/Logo-GST_Centr.png" />
+			<br />
+			<br />
+		</div>
+		<EditForm Model="@_user" OnValidSubmit="() => HandleSubmit()" class="custom-form">
+			<FluentValidationValidator />
+			<div class="user-box">
+				<InputText @bind-Value="@_user.Username" class="custom-input" />
+				<label class="custom-label">Имя пользователя</label>
+				<ValidationMessage For="() => _user.Username" />
+			</div>
+			<div class="user-box">
+				<InputText @bind-Value="@_user.Password" type="password" class="custom-input" />
+				<label class="custom-label">Пароль</label>
+				<ValidationMessage For="() => _user.Password" />
+			</div>
+			<span class="custom-span">
+				<button type="submit">Войти</button>
+			</span>
+		</EditForm>
+		<div class="social">
+			<div class="icons">
+				<a href="https://zaogst.ru/" target="_blank" rel="noopener noreferrer" class="fa-solid fa-fire-extinguisher" title="Сайт АО НПЦ ГСТ"></a>
+				<a href="https://github.com/ZV-Inc/ZAOGST.WIS" target="_blank" rel="noopener noreferrer" class="fa-brands fa-github" title="Исходный код"></a>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private UserLoginDto _user = new();
+
+	private async Task HandleSubmit()
+	{
+		User? userEntity = await UserService.GetByUsername(_user.Username);
+
+		if (userEntity == null || userEntity.Password != _user.Password)
+		{
+			await JsRuntime.InvokeVoidAsync("alert", "Неверное имя пользователя или пароль.");
+			return;
+		}
+
+		CustomAuthenticationStateProvider? customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+
+		await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+			{
+				Username = userEntity.Username,
+				Role = userEntity.Role
+			});
+
+		NavigationManager.NavigateTo("/", true);
+	}
+}

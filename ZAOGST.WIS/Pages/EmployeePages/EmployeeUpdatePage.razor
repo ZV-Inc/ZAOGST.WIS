@@ -1,0 +1,75 @@
+﻿@page "/employeeupdate/{id:int}"
+@attribute [Authorize(Roles = UserRoles.Admin)]
+@inject IJSRuntime JsRuntime
+@inject IUserService UserService
+@inject DataContext Context
+@inject NavigationManager NavigationManager
+
+<PageTitle>Обновить данные сотрудника</PageTitle>
+
+<h3>Обновить данные сотрудника @_user.Username</h3>
+
+<EditForm Model="@_user" OnValidSubmit="HandleSubmit">
+	<div class="form-group my-adaptive-div">
+		<label for="username" class="form-label">Логин</label>
+		<InputText id="username" @bind-Value="_user.Username" class="form-control" placeholder="Логин сотрудника"></InputText>
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<label for="password" class="form-label">Пароль</label>
+		<InputText id="password" @bind-Value="_user.Password" class="form-control" placeholder="Пароль сотрудника"></InputText>
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<label class="form-label">Роль</label>
+		<InputSelect class="form-select form-control form-control-sm" @bind-Value="_user.Role">
+			@foreach (var role in _userRoles)
+			{
+				<option value="@role">@role</option>
+			}
+		</InputSelect>
+	</div>
+
+	<br />
+	<br />
+	<button type="submit" class="btn btn-success">Обновить</button>
+	<button @onclick=DeleteButtonClick type="submit" class="btn btn-danger">Удалить</button>
+	<button @onclick=ToPreviousPage type="button" class="btn btn-secondary">Назад</button>
+</EditForm>
+
+@code {
+	[Parameter]
+	public int Id { get; set; }
+	private User? _user;
+	private List<string> _userRoles = UserRoles.RolesList.ToList();
+
+	protected override async Task OnInitializedAsync()
+	{
+		_user = await UserService.GetById(Id);
+
+		if (_user == null) throw new UserNotFoundException();
+	}
+
+	private async void HandleSubmit()
+	{
+		_user.DateUpdated = DateTime.Now;
+		await UserService.Update(_user);
+		ToPreviousPage();
+	}
+
+	private async void DeleteButtonClick()
+	{
+		bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены что хотите удалить сотрудника {_user.Username} из списка?");
+
+		if (confirmed)
+		{
+			await UserService.Delete(_user.Id);
+			ToPreviousPage();
+		}
+	}
+
+	private void ToPreviousPage()
+	{
+		NavigationManager.NavigateTo("/employeesview", true);
+	}
+}

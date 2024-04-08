@@ -2,11 +2,9 @@
 
 public interface IBallonService
 {
-	List<Ballon> Ballons { get; set; }
-	Task LoadBallon();
-	Task<Ballon> GetSingleBallonById(int id);
-	Task<Ballon> GetSingleBallonByStrainGaugeNumber(int strainGaugeNumber);
-	Task CreateBallon(Ballon ballon);
-	Task UpdateBallon(Ballon ballon);
-	Task DeleteBallon(int id);
+	Task Create(Ballon ballon);
+	Task Update(Ballon ballon);
+	Task Delete(int id);
+	Task<Ballon> GetById(int id);
+	Task<List<Ballon>> GetList();
 }

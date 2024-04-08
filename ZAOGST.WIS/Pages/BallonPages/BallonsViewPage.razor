@@ -1,101 +1,85 @@
 ﻿@page "/ballonsview"
-@inject IJSRuntime JsRuntime
+@attribute [Authorize]
 @inject IBallonService BallonService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Баллоны</PageTitle>
 
-@if (_ballonData == null || IsLoading)
+@if (_ballonData == null || _isLoading)
 {
 	<div class="loading-rectangle"></div>
 	<div class="loading-spinner"></div>
+	@* WARNING! THIS FUNCTIONAL ONLY FOR DEV BUILD <div><p class="loading-text-center">Добавление баллона @CurrentRandomBallonLoadNumber из @RANDOM_BALLON_COUNT ... Пожалуйста подождите...</p></div> *@
 }
 else
 {
 	<h3>Баллоны</h3>
 	<br />
 	<button @onclick="(() => CreateNewBallon())" class="btn btn-primary" title="Добавить баллон">Добавить баллон</button>
-	<div class="d-inline"> | </div>
-	<button @onclick=StartCreateRandomBallons class="btn btn-primary" title="Добавить баллон">Добавить случайные баллоны</button>
+
+	@* WARNING! THIS FUNCTIONAL ONLY FOR DEV BUILD <div class="d-inline"> | </div>
+	<button @onclick=StartCreateRandomBallons class="btn btn-primary" title="Добавить баллон">Добавить случайные баллоны</button> *@
+
 	<br />
 	<br />
 	<Table T="Ballon" Items="_ballonData" PageSize="15" RowClickAction="RowClick" class="table table-striped table-sm table-bordered">
 		<Column TableItem="Ballon" Title="Тензодатчик" Field="@(x => x.StrainGaugeNumber)" Sortable="true" Filterable="true" Width="3%" />
 		<Column TableItem="Ballon" Title="Номер" Field="@(x => x.BallonNumber)" Sortable="true" Filterable="true" Width="10%" />
-		@* <Column TableItem="Ballon" Title="Обновлено" Field="@(x => x.DateUpdated)" Sortable="true" Filterable="true" Width="20%" /> *@
 		<Column TableItem="Ballon" Title="Дата добавления" Field="@(x => x.DateAdded)" Sortable="true" Filterable="true" Width="20%" />
 		<Pager ShowPageNumber="true" />
 	</Table>
 }
 
 @code {
-	[Parameter]
-	public bool IsLoading { get; set; } = false;
-	private Ballon _ballon = new();
-	private Ballon[] _ballonData;
-	private Ballon _selectedBallon;
-	private Random _random = new();
+	private bool _isLoading { get; set; } = false;
+	private List<Ballon>? _ballonData = new();
 
 	protected override async Task OnInitializedAsync()
 	{
-		await Task.Run(LoadBallonsData);
+		await Task.Run(LoadBallonsData); //TODO: Приложение падает если на этом этапе пытаться перезагрузиться или перейти на другую страницу
 	}
 
 	private async void LoadBallonsData()
 	{
-		await BallonService.LoadBallon();
-		_ballonData = BallonService.Ballons.ToArray();
+		_ballonData = await BallonService.GetList();
 	}
-
-	// private async Task DeleteConfirm(int id)
-	// {
-	// 	var system = await EmptySystemService.GetSingleEmptySystem(id);
-	// 	bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Вы уверены что хотите удалить \"{system.Name}\"?");
-
-	// 	if (confirmed)
-	// 	{
-	// 		await EmptySystemService.DeleteEmptySystem(id);
-	// 		NavigationManager.NavigateTo("controlemptysystems", true);
-	// 	}
-	// }
 
 	private void RowClick(Ballon ballon)
 	{
-		_selectedBallon = ballon;
-		// StateHasChanged();
-		ShowBallon(_selectedBallon.Id);
+		NavigationManager.NavigateTo($"/ballonupdate/{ballon.Id}");
 	}
 
-	private void ShowBallon(int id)
-	{
-		NavigationManager.NavigateTo($"/ballonupdate/{id}");
-	}
-
-	private async void CreateNewBallon()
+	private void CreateNewBallon()
 	{
 		NavigationManager.NavigateTo("/balloncreate");
-		// await InvokeAsync(StateHasChanged);
 	}
 
-	private async void StartCreateRandomBallons()
-	{
-		IsLoading = true;
-		await Task.Run(CreateNewRandomBallons);
-	}
+	#region ONLY FOR DEV BUILD
+	// private const int RANDOM_BALLON_COUNT = 17;
+	// private int _currentRandomBallonLoadNumber = 1;
 
-	private async void CreateNewRandomBallons()
-	{
-		for (int i = 0; i < 17; i++)
-		{
-			Ballon ballon = new()
-				{
-					StrainGaugeNumber = _random.Next(1, 999999),
-					BallonNumber = BallonNumbers.GetProperiesList()[_random.Next(1, 16)]
-				};
+	// private async void StartCreateRandomBallons()
+	// {
+	// 	_isLoading = true;
+	// 	await Task.Run(CreateNewRandomBallons);
+	// }
 
-			await BallonService.CreateBallon(ballon);
-		}
+	// private async void CreateNewRandomBallons()
+	// {
+	// 	for (int i = 0; i < 17; i++)
+	// 	{
+	// 		Ballon ballon = new()
+	// 			{
+	// 				StrainGaugeNumber = _random.Next(1, 999999),
+	// 				BallonNumber = BallonNumbers.NumbersList.ToList()[_random.Next(1, 16)]
+	// 			};
 
-		NavigationManager.NavigateTo("/ballonsview", true);
-	}
+	// 		_currentRandomBallonLoadNumber = i + 1;
+	// 		await InvokeAsync(StateHasChanged);
+	// 		await BallonService.Create(ballon);
+	// 	}
+
+	// 	NavigationManager.NavigateTo("/ballonsview", true);
+	// }
+	#endregion
 }

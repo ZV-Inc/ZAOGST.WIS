@@ -1,0 +1,42 @@
+﻿@page "/sendedshippedcontrolblocksview"
+@inject IShippedControlBlockService ShippedControlBlockService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Отправленные блоки управления</PageTitle>
+
+@if (_sendedShippedControlBlocksData == null)
+{
+	<div class="loading-rectangle"></div>
+	<div class="loading-spinner"></div>
+}
+else
+{
+	<h3>Отправленные блоки управления</h3>
+	<br />
+	<br />
+	<Table TableItem="ShippedControlBlock" Items="_sendedShippedControlBlocksData" PageSize="15" RowClickAction="RowClick" class="table table-striped table-sm table-bordered">
+		<Column TableItem="ShippedControlBlock" Title="Тип" Field="@(x => x.Type)" Sortable="true" Filterable="true" Width="10%" />
+		<Column TableItem="ShippedControlBlock" Title="Дата отгрузки" Field="@(x => x.ShippingDate)" Sortable="true" Filterable="true" Width="20%" />
+		<Column TableItem="ShippedControlBlock" Title="Дата добавления" Field="@(x => x.DateAdded)" Sortable="true" Filterable="true" Width="20%" />
+		<Pager ShowPageNumber="true"></Pager>
+	</Table>
+}
+
+@code {
+	private List<ShippedControlBlock>? _sendedShippedControlBlocksData;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Run(LoadShippedControlBlocksData); //TODO: Приложение падает если на этом этапе пытаться перезагрузиться или перейти на другую страницу
+	}
+
+	private async void LoadShippedControlBlocksData()
+	{
+		_sendedShippedControlBlocksData = await ShippedControlBlockService.GetSended();
+	}
+
+	private void RowClick(ShippedControlBlock shippedControlBlock)
+	{
+		NavigationManager.NavigateTo($"/shipmentupdate/{shippedControlBlock.Id}");
+	}
+}

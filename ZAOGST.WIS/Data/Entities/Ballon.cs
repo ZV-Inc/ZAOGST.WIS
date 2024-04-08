@@ -4,7 +4,7 @@ public class Ballon : BaseEntity
 {
 	public int? StrainGaugeNumber { get; set; }
 	public string BallonNumber { get; set; } = BallonNumbers.NONE;
-	public string? ShippingDate { get; set; } = DateTime.Now.ToShortDateString();
+	public string? ShippingDate { get; set; } = string.Empty;
 	public int? ControlBlockId { get; set; }
 	public virtual ControlBlock? ControlBlock { get; set; }
 }
@@ -50,7 +50,7 @@ public class BallonNumbers
 	public const string B6_200 = "B6-200(2K)";
 	public const string B7_200 = "B7-200(2K)";
 
-	public static List<string> GetProperiesList() => new()
+	public static readonly List<string> NumbersList = new()
 	{
 		NONE,
 		B1_90,

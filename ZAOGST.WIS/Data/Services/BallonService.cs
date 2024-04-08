@@ -20,7 +20,6 @@ public class BallonService : IBallonService
 		dbBallon.BallonNumber = ballon.BallonNumber;
 		dbBallon.ControlBlockId = ballon.ControlBlockId;
 		dbBallon.ControlBlock = ballon.ControlBlock;
-		dbBallon.DateUpdated = ballon.DateUpdated;
 
 		await _context.SaveChangesAsync();
 	}

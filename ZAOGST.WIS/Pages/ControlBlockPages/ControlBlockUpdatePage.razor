@@ -493,7 +493,7 @@ else
 	private int _currentControlBlockNumber = 0;
 	private List<Ballon> _ballons = new();
 	private Ballon? _selectedBallon;
-	private DateTime _shippingDateTime = DateTimeConverter.GetNowUTC5();
+	private DateTime _shippingDateTime = DateTime.Now;
 	private Ballon[] _ballonArray = new Ballon[7];
 
 	private Ballon? _ballon1;
@@ -653,7 +653,7 @@ else
 	{
 		_controlBlock.Type = $"{_currentControlBlockType}/№{_currentControlBlockNumber}";
 		_controlBlock.ShippingDate = _shippingDateTime.ToShortDateString();
-		_controlBlock.DateUpdated = DateTimeConverter.GetNowUTC5();
+		_controlBlock.DateUpdated = DateTime.Now;
 
 		await ControlBlockService.Update(_controlBlock);
 		ToPreviousPage();

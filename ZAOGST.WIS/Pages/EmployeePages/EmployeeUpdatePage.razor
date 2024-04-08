@@ -4,103 +4,55 @@
 @inject IUserService UserService
 @inject DataContext Context
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Обновить данные сотрудника</PageTitle>
 
-@if (_user.Username != "ZV") //Making sence
-{
-	<h3>Обновить данные сотрудника @_user.Username</h3>
+<h3>Обновить данные сотрудника @_user.Username</h3>
 
-	<EditForm Model="@_user" OnValidSubmit="HandleSubmit">
-		<div class="form-group my-adaptive-div">
-			<label for="username" class="form-label">Новый логин</label>
-			<InputText id="username" @bind-Value="_newUsername" class="form-control" placeholder="Логин сотрудника"></InputText>
-		</div>
-		<br />
-		<div class="form-group my-adaptive-div">
-			<label for="password" class="form-label">Новый пароль</label>
-			<InputText id="password" @bind-Value="_newPassword" class="form-control" placeholder="Пароль сотрудника"></InputText>
-		</div>
-		<br />
-		<div class="form-group my-adaptive-div">
-			<label class="form-label">Роль</label>
-			<InputSelect class="form-select form-control form-control-sm" @bind-Value="_newRole">
-				@foreach (var role in _userRoles)
-				{
-					<option value="@role">@role</option>
-				}
-			</InputSelect>
-		</div>
+<EditForm Model="@_user" OnValidSubmit="HandleSubmit">
+	<div class="form-group my-adaptive-div">
+		<label for="username" class="form-label">Логин</label>
+		<InputText id="username" @bind-Value="_user.Username" class="form-control" placeholder="Логин сотрудника"></InputText>
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<label for="password" class="form-label">Пароль</label>
+		<InputText id="password" @bind-Value="_user.Password" class="form-control" placeholder="Пароль сотрудника"></InputText>
+	</div>
+	<br />
+	<div class="form-group my-adaptive-div">
+		<label class="form-label">Роль</label>
+		<InputSelect class="form-select form-control form-control-sm" @bind-Value="_user.Role">
+			@foreach (var role in _userRoles)
+			{
+				<option value="@role">@role</option>
+			}
+		</InputSelect>
+	</div>
 
-		<br />
-		<br />
-		<button type="submit" class="btn btn-success">Обновить</button>
-
-		@if (_authState != null && _user.Username == _authState.User.Identity.Name)
-		{
-			<button disabled class="btn btn-danger">Удалить</button>
-		}
-		else
-		{
-			<button @onclick=DeleteButtonClick type="submit" class="btn btn-danger">Удалить</button>
-		}
-
-		<button @onclick=ToPreviousPage type="button" class="btn btn-secondary">Назад</button>
-	</EditForm>
-}
-else
-{
-	<h1>F U</h1> // Proof me wrong
-}
+	<br />
+	<br />
+	<button type="submit" class="btn btn-success">Обновить</button>
+	<button @onclick=DeleteButtonClick type="submit" class="btn btn-danger">Удалить</button>
+	<button @onclick=ToPreviousPage type="button" class="btn btn-secondary">Назад</button>
+</EditForm>
 
 @code {
 	[Parameter]
 	public int Id { get; set; }
-	private string _newUsername = string.Empty;
-	private string _newPassword = string.Empty;
-	private string _newRole = string.Empty;
 	private User? _user;
 	private List<string> _userRoles = UserRoles.RolesList.ToList();
-	private AuthenticationState? _authState = null;
 
 	protected override async Task OnInitializedAsync()
 	{
 		_user = await UserService.GetById(Id);
-		_authState = await AuthStateProvider.GetAuthenticationStateAsync();
-		_newRole = _user.Role;
 
 		if (_user == null) throw new UserNotFoundException();
 	}
 
 	private async void HandleSubmit()
 	{
-		string newHashedPassword = BCrypt.Net.BCrypt.HashPassword(_newPassword);
-
-		if (_user.Username == _newUsername && _user.Password == newHashedPassword && _user.Role == _newRole)
-		{
-			await JsRuntime.InvokeVoidAsync("alert", "Этои данные уже используются для этого пользователя.");
-			return;
-		}
-
-		if (!string.IsNullOrEmpty(_newPassword) && _user.Password != newHashedPassword)
-		{
-			_user.Password = newHashedPassword;
-			_user.DateUpdated = DateTimeConverter.GetNowUTC5();
-		}
-
-		if (!string.IsNullOrEmpty(_newUsername) && _user.Username != _newUsername)
-		{
-			_user.Username = _newUsername;
-			_user.DateUpdated = DateTimeConverter.GetNowUTC5();
-		}
-
-		if (_user.Role != _newRole)
-		{
-			_user.Role = _newRole;
-			_user.DateUpdated = DateTimeConverter.GetNowUTC5();
-		}
-
+		_user.DateUpdated = DateTime.Now;
 		await UserService.Update(_user);
 		ToPreviousPage();
 	}

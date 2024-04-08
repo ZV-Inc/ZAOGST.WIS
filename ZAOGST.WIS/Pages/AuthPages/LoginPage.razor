@@ -6,6 +6,8 @@
 
 <PageTitle>Вход</PageTitle>
 
+<h3>Вход</h3>
+
 <div class="custom-body">
 	<div class="custom-container">
 		<div class="logo">
@@ -31,8 +33,8 @@
 		</EditForm>
 		<div class="social">
 			<div class="icons">
-				<div class="social-icon" style="background-color: red"><a href="https://zaogst.ru/" target="_blank" rel="noopener noreferrer" class="fa-solid fa-fire-extinguisher" title="Сайт АО НПЦ ГСТ"></a></div>
-				<a href="https://t.me/Zeerck" target="_blank" rel="noopener noreferrer" class="fa-brands fa-telegram" style="color: #0088CC; width: 50px; height: 50px; font-size: 50px;" title="Связь с разработчиком"></a>
+				<a href="https://zaogst.ru/" target="_blank" rel="noopener noreferrer" class="fa-solid fa-fire-extinguisher" title="Сайт АО НПЦ ГСТ"></a>
+				<a href="https://github.com/ZV-Inc/ZAOGST.WIS" target="_blank" rel="noopener noreferrer" class="fa-brands fa-github" title="Исходный код"></a>
 			</div>
 		</div>
 	</div>
@@ -45,7 +47,7 @@
 	{
 		User? userEntity = await UserService.GetByUsername(_user.Username);
 
-		if (userEntity == null || !BCrypt.Net.BCrypt.Verify(_user.Password, userEntity.Password)/* userEntity.Password != _user.Password */)
+		if (userEntity == null || userEntity.Password != _user.Password)
 		{
 			await JsRuntime.InvokeVoidAsync("alert", "Неверное имя пользователя или пароль.");
 			return;
@@ -59,6 +61,6 @@
 				Role = userEntity.Role
 			});
 
-		NavigationManager.NavigateTo("/shipmentsview", true);
+		NavigationManager.NavigateTo("/", true);
 	}
 }

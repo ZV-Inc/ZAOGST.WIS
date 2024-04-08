@@ -3,6 +3,7 @@
 
 html, body {
     font-family: 'Overpass', Helvetica, Arial, sans-serif;
+    /*font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
 }
 
 h1:focus {
@@ -116,11 +117,8 @@ a, .btn-link {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 90vh;
     background: linear-gradient(#092464, #3a0647);
-    margin-top: -1.1rem;
-    margin-right: -1.5rem;
-    margin-left: -2rem;
 }
 
 .custom-container {
@@ -195,8 +193,7 @@ a, .btn-link {
         }
 
 .social {
-    border-top: 2px solid #ccc;
-    margin-top: 80px;
+    margin-top: 60px;
 }
 
 .icons {
@@ -209,19 +206,8 @@ a, .btn-link {
 
     .icons a {
         text-decoration: none;
-        color: white;
+        color: indigo;
     }
-
-.social-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-}
 
 .my-info-div {
     padding: 10px 10px;

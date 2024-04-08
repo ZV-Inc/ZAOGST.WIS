@@ -3,6 +3,6 @@
 public class BaseEntity
 {
 	public int Id { get; set; }
-	public DateTime DateAdded { get; set; } = DateTimeConverter.GetNowUTC5();
-	public DateTime DateUpdated { get; set; } = DateTimeConverter.GetNowUTC5();
+	public DateTime DateAdded { get; set; } = DateTime.Now;
+	public DateTime DateUpdated { get; set; } = DateTime.Now;
 }

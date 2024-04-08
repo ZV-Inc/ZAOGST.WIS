@@ -2,15 +2,16 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
-@* <MudAppBar Color="Color.Info" Fixed="false">
-	<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-	<MudSpacer />
-	<MudIconButton Icon="@Icons.Material.TwoTone.Login" Color="Color.Inherit" />
-</MudAppBar> *@
-
 <div class="top-row ps-3 navbar navbar-dark">
 	<div class="container-fluid">
-		<a class="navbar-brand" href="controlblocksview">Склад</a> | <a class="navbar-brand" href="shipmentsview">Отгрузка</a>
+		<AuthorizeView>
+			<Authorized>
+				<a class="navbar-brand" href="controlblocksview">Склад</a> | <a class="navbar-brand" href="shipmentsview">Отгрузка</a>
+			</Authorized>
+			<NotAuthorized>
+				<a class="navbar-brand" href="shipmentsview">Отгрузка</a>
+			</NotAuthorized>
+		</AuthorizeView>
 		<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -18,39 +19,39 @@
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-	<nav class="flex-column">
-		<div class="nav-item px-3">
-			<NavLink class="nav-link" href="controlblocksview">
-				<span class="oi oi-box" aria-hidden="true"></span>Блоки управления
-			</NavLink>
-		</div>
-		<div class="nav-item px-3">
-			<NavLink class="nav-link" href="ballonsview">
-				<span class="oi oi-box" aria-hidden="true"></span>Баллоны
-			</NavLink>
-		</div>
-		<div class="nav-item px-3">
-			<hr style="color: white;" />
-		</div>
-		<AuthorizeView>
-			<div class="nav-item px-3">
-				<span style="color: white">Авторизованы как: @context.User.Identity.Name</span>
-			</div>
-		</AuthorizeView>
-		<AuthorizeView Roles=@UserRoles.Admin Context="inner">
-			<div class="nav-item px-3">
-				<NavLink class="nav-link" href="employeesview">
-					<span class="oi oi-people" aria-hidden="true"></span>Сотрудники
-				</NavLink>
-			</div>
-		</AuthorizeView>
-		<div class="nav-item px-3">
-			<NavLink class="nav-link" @onclick="LogoutButton">
-				<span class="oi oi-account-logout" aria-hidden="true"></span>Выйти
-			</NavLink>
-		</div>
-	</nav>
 	<AuthorizeView>
+		<Authorized>
+			<nav class="flex-column">
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="controlblocksview">
+						<span class="oi oi-box" aria-hidden="true"></span>Блоки управления
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="ballonsview">
+						<span class="oi oi-box" aria-hidden="true"></span>Баллоны
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<hr style="color: white;" />
+				</div>
+				<div class="nav-item px-3">
+					<span style="color: white">Авторизованы как: @context.User.Identity.Name</span>
+				</div>
+				<AuthorizeView Roles=@UserRoles.Admin Context="inner">
+					<div class="nav-item px-3">
+						<NavLink class="nav-link" href="employeesview">
+							<span class="oi oi-people" aria-hidden="true"></span>Сотрудники
+						</NavLink>
+					</div>
+				</AuthorizeView>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" @onclick="LogoutButton">
+						<span class="oi oi-account-logout" aria-hidden="true"></span>Выйти
+					</NavLink>
+				</div>
+			</nav>
+		</Authorized>
 		<NotAuthorized>
 			<nav class="flex-column">
 				<div class="nav-item px-3">
@@ -62,6 +63,7 @@
 		</NotAuthorized>
 	</AuthorizeView>
 </div>
+
 
 @code {
 	private bool collapseNavMenu = true;

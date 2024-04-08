@@ -33,8 +33,6 @@ public class ControlBlockService : IControlBlockService
 		if (controlBlock.Ballons != null)
 			dbControlBlock.Ballons = controlBlock.Ballons;
 
-		dbControlBlock.DateUpdated = controlBlock.DateUpdated;
-
 		await _context.SaveChangesAsync();
 	}
 

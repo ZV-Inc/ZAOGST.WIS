@@ -36,7 +36,7 @@
 @code {
 	private ControlBlock _controlBlock = new();
 	private List<string> _controlBlockTypes = new();
-	private DateTime _shippingDateTime = DateTimeConverter.GetNowUTC5();
+	private DateTime _shippingDateTime = DateTime.Now;
 
 	protected override async Task OnInitializedAsync()
 	{

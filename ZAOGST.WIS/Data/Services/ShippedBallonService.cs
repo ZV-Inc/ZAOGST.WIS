@@ -28,7 +28,6 @@ public class ShippedBallonService : IShippedBallonService
 
 		dbShippedBallon.StrainGaugeNumber = shippedBallon.StrainGaugeNumber;
 		dbShippedBallon.BallonNumber = shippedBallon.BallonNumber;
-		dbShippedBallon.DateUpdated = shippedBallon.DateUpdated;
 
 		await _context.SaveChangesAsync();
 	}

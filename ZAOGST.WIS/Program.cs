@@ -8,8 +8,6 @@ global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 
-global using MudBlazor.Services;
-
 global using System.Security.Claims;
 global using System.Text.Json;
 
@@ -34,7 +32,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddSqlite<DataContext>(@"Data Source=Data\DataBase\ZAOGST.WIS.DataBase.db");
-builder.Services.AddMudServices();
 builder.Services.AddBlazorTable();
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();

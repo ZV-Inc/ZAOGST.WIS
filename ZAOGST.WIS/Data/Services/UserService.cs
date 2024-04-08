@@ -19,7 +19,6 @@ public class UserService : IUserService
 		dbUser.Username = user.Username;
 		dbUser.Password = user.Password;
 		dbUser.Role = user.Role;
-		dbUser.DateUpdated = user.DateUpdated;
 
 		_context.Users.Update(dbUser);
 		await _context.SaveChangesAsync();

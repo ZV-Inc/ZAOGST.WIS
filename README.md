@@ -4,6 +4,8 @@
 Научно-производственный центр
 "Горноспасательные технологии"» ([ссылка](https://zaogst.ru/)). Проект нацелен на упрощение ведения учёта систем контроля.
 
+Ссылка на это проект: [serwisgst.ru](!https://serwisgst.ru/)
+
 <div align="center">
   <a href="https://github.com/ZV-Inc/ZAOGST.WIS/issues">Известные ошибки</a>
   |

@@ -1,0 +1,175 @@
+﻿@page "/documents/{currentDirectoryName}"
+@inject IDirectoryService DirectoryService
+@inject IWebHostEnvironment Environment
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<h3>@CurrentDirectoryName</h3>
+<br />
+<MudButton OnClick="OpenAddFileDialog" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileUpload" Color="Color.Primary">Добавить файл</MudButton>
+<br />
+<br />
+<hr style="color: black" />
+<br />
+@if (_files.Count < 1)
+{
+    <MudText Typo="Typo.h6">Файлов нет</MudText>
+}
+else
+{
+    <MudDataGrid T="Dictionary<string, string>" Items="@_normalFilesNames" RowClick="DownloadFileFromStream"
+                 SortMode="SortMode.Multiple" Filterable="true" QuickFilter="_quickFilter">
+        <ToolBarContent>
+            <MudText>Файлы</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <TemplateColumn Title="Имя файла" Sortable="true" Filterable="true">
+                <CellTemplate>
+                    <MudIcon Icon="@Icons.Material.Filled.FileUpload"></MudIcon>
+                    <MudLink>@context.Item.Keys.FirstOrDefault(x => !string.IsNullOrEmpty(x))</MudLink>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+
+<MudDialog @bind-IsVisible="_isAddFileDialogOpened" Options="_createDialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.FileUpload" Class="mr-3" /> Добавить файл
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".pdf" FilesChanged="UploadFiles" MaximumFileCount="100" Multiple>
+            <ButtonTemplate>
+                <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.UploadFile" for="@context.Id">
+                    Выбрать файлы
+                </MudButton>
+                <br />
+                <hr style="color: black" />
+                <br />
+            </ButtonTemplate>
+            <SelectedTemplate>
+                @if (context != null)
+                {
+                    @foreach (var file in context)
+                    {
+                        <MudText>@file.Name</MudText>
+                    }
+                }
+                else
+                {
+                    <MudText>Файлы не выбраны</MudText>
+                }
+            </SelectedTemplate>
+        </MudFileUpload>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Style="background-color: lightgray" OnClick="CloseAddFileDialog" Class="px-10">Отмена</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ProcessUploadFiles" Class="px-10">Добавить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public string CurrentDirectoryName { get; set; }
+    private string _uploadsDirectoryPath = string.Empty;
+    private bool _isAddFileDialogOpened = false;
+    private List<FileInfo> _files = new();
+    private List<IBrowserFile> _filesAwaitToUpload = new();
+    private DialogOptions _createDialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+    private List<UploadResultDto> _uploadResults = new();
+    private const long MAX_FILE_SIZE = long.MaxValue;
+    private List<Dictionary<string, string>> _normalFilesNames = new();
+    private string _searchString;
+
+    protected override void OnInitialized()
+    {
+        _uploadsDirectoryPath = Path.Combine(Environment.ContentRootPath, "uploads");
+        _files = DirectoryService.GetFilesInfo(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName));
+
+        foreach (var file in _files)
+        {
+            Dictionary<string, string> newDict = new Dictionary<string, string>()
+            {
+                { Regex.Match(file.Name, @"^.*?(?=_addition-)").Value , file.FullName }
+            };
+
+            _normalFilesNames.Add(newDict); //TODO: Bad thing, need make this right way
+        }
+    }
+
+    private async void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    {
+        foreach (var file in files)
+            _filesAwaitToUpload.Add(file);
+    }
+
+    private async void ProcessUploadFiles()
+    {
+        try
+        {
+            foreach (var file in _filesAwaitToUpload)
+            {
+                // TODO: Make randomName for files normally with DB?
+                Stream fileStream = file.OpenReadStream(MAX_FILE_SIZE);
+
+                string randomAddition = Path.GetRandomFileName();
+
+                string randomFile = Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, $"{file.Name}_addition-{randomAddition}");
+                string extention = Path.GetExtension(file.Name);
+                string targetFilePath = Path.ChangeExtension(randomFile, extention);
+
+                var targetStream = new FileStream(targetFilePath, FileMode.Create);
+                await fileStream.CopyToAsync(targetStream);
+                targetStream.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"PROGRAM EXCEPTION CATCH: {ex.Message}");
+        }
+
+        NavigationManager.NavigateTo($"/documents/{CurrentDirectoryName}", true);
+    }
+
+    private Stream GetFileStream(string path) => File.OpenRead(path);
+
+    private async Task DownloadFileFromStream(DataGridRowClickEventArgs<Dictionary<string, string>> dict)
+    {
+        var fileStream = GetFileStream(dict.Item.Values.FirstOrDefault(x => !string.IsNullOrEmpty(x)));
+        var fileName = dict.Item.Keys.FirstOrDefault(x => !string.IsNullOrEmpty(x));
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+    private string? GetStoredFileName(string fileName)
+    {
+        var uploadResult = _uploadResults.SingleOrDefault(f => f.FileName == fileName);
+
+        if (uploadResult is not null)
+            return uploadResult.StoredFileName;
+
+        return "Не удалось найти файл";
+    }
+
+    private void OpenAddFileDialog() => _isAddFileDialogOpened = true;
+    private void CloseAddFileDialog() => _isAddFileDialogOpened = false;
+
+    private Func<Dictionary<string, string>, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Keys.FirstOrDefault().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+}

@@ -2,5 +2,5 @@
 
 public static class DateTimeConverter
 {
-	public static DateTime GetNowUTC5() => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Asia/Yekaterinburg"));
+	public static DateTime GetConvertedGPT5(DateTime dateTime) => DateTime.Parse(dateTime.ToString("dd.MM.yyyy H:mm:ss"));
 }

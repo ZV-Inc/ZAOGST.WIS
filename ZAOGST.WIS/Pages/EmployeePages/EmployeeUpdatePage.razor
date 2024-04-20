@@ -86,19 +86,19 @@ else
 		if (!string.IsNullOrEmpty(_newPassword) && _user.Password != newHashedPassword)
 		{
 			_user.Password = newHashedPassword;
-			_user.DateUpdated = DateTimeConverter.GetNowUTC5();
+			_user.DateUpdated = DateTimeConverter.GetConvertedGPT5(DateTime.Now);
 		}
 
 		if (!string.IsNullOrEmpty(_newUsername) && _user.Username != _newUsername)
 		{
 			_user.Username = _newUsername;
-			_user.DateUpdated = DateTimeConverter.GetNowUTC5();
+			_user.DateUpdated = DateTimeConverter.GetConvertedGPT5(DateTime.Now);
 		}
 
 		if (_user.Role != _newRole)
 		{
 			_user.Role = _newRole;
-			_user.DateUpdated = DateTimeConverter.GetNowUTC5();
+			_user.DateUpdated = DateTimeConverter.GetConvertedGPT5(DateTime.Now);
 		}
 
 		await UserService.Update(_user);

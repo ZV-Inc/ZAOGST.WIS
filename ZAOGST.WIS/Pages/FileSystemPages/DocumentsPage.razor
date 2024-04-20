@@ -1,0 +1,77 @@
+﻿@page "/documents"
+@inject IWebHostEnvironment Environment
+@inject IDirectoryService DirectoryService
+@inject NavigationManager NavigationManager
+
+<h3>Документация</h3>
+<br />
+<MudButton OnClick="OpenCreateDialog" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Добавить папку</MudButton>
+<br />
+<hr style="color: black" />
+<br />
+
+@if (_directories.Count < 1)
+{
+    <MudText Typo="Typo.h6">Папок нет</MudText>
+}
+else
+{
+    <MudDataGrid T="DirectoryInfo" Items="@_directories" RowClick="RowClickEvent">
+        <Columns>
+            <TemplateColumn Title="Имя папки">
+                <CellTemplate>
+                    <MudIcon Icon="@Icons.Material.Filled.Folder"></MudIcon>
+                    <MudLink>@context.Item.Name</MudLink>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
+
+<MudDialog @bind-IsVisible="_isCreateDialogVisible" Options="_createDialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> Добавить папку
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="_directoryName" Label="Имя папки" Variant="Variant.Text"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Style="background-color: lightgray" OnClick="CloseCreateDialog" Class="px-10">Отмена</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => CreateDirectory(_directoryName)" Class="px-10">Добавить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private string _uploadsDirectoryPath = string.Empty;
+    private List<DirectoryInfo> _directories = new();
+    private bool _isCreateDialogVisible = false;
+    private DialogOptions _createDialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+    private string _directoryName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _uploadsDirectoryPath = Path.Combine(Environment.ContentRootPath, "uploads");
+
+        if (!Directory.Exists(_uploadsDirectoryPath))
+            Directory.CreateDirectory(_uploadsDirectoryPath);
+
+        _directories = DirectoryService.GetDirectoriesInfo(_uploadsDirectoryPath);
+    }
+
+    private void RowClickEvent(DataGridRowClickEventArgs<DirectoryInfo> args)
+    {
+        NavigationManager.NavigateTo($"/documents/{args.Item.Name}");
+    }
+
+    private void CreateDirectory(string directoryName)
+    {
+        DirectoryService.Create(Path.Combine(_uploadsDirectoryPath, directoryName));
+        NavigationManager.NavigateTo("/documents", true);
+    }
+
+    private void OpenCreateDialog() => _isCreateDialogVisible = true;
+
+    private void CloseCreateDialog() => _isCreateDialogVisible = false;
+}

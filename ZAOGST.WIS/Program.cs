@@ -1,7 +1,6 @@
 global using Blazored.LocalStorage;
 global using BlazorTable;
 global using FluentValidation;
-
 global using Microsoft.AspNetCore.Components.Authorization;
 global using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -10,6 +9,7 @@ global using Microsoft.EntityFrameworkCore;
 
 global using MudBlazor.Services;
 
+global using System.Net;
 global using System.Security.Claims;
 global using System.Text.Json;
 
@@ -31,9 +31,10 @@ builder.Services.AddScoped<IBallonService, BallonService>();
 builder.Services.AddScoped<IShippedControlBlockService, ShippedControlBlockService>();
 builder.Services.AddScoped<IShippedBallonService, ShippedBallonService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDirectoryService, DirectoryService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
-builder.Services.AddSqlite<DataContext>(@"Data Source=Data\DataBase\ZAOGST.WIS.DataBase.db");
+builder.Services.AddSqlite<DataContext>(@"Data Source=./Data/DataBase/ZAOGST.WIS.DataBase.db");
 builder.Services.AddMudServices();
 builder.Services.AddBlazorTable();
 builder.Services.AddControllersWithViews();

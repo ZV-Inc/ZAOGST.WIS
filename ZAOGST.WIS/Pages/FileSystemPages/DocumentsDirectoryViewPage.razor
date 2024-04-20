@@ -82,7 +82,6 @@ else
     private List<FileInfo> _files = new();
     private List<IBrowserFile> _filesAwaitToUpload = new();
     private DialogOptions _createDialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
-    private List<UploadResultDto> _uploadResults = new();
     private const long MAX_FILE_SIZE = long.MaxValue;
     private List<Dictionary<string, string>> _normalFilesNames = new();
     private string _searchString;
@@ -147,16 +146,6 @@ else
         using var streamRef = new DotNetStreamReference(stream: fileStream);
 
         await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-    }
-
-    private string? GetStoredFileName(string fileName)
-    {
-        var uploadResult = _uploadResults.SingleOrDefault(f => f.FileName == fileName);
-
-        if (uploadResult is not null)
-            return uploadResult.StoredFileName;
-
-        return "Не удалось найти файл";
     }
 
     private void OpenAddFileDialog() => _isAddFileDialogOpened = true;

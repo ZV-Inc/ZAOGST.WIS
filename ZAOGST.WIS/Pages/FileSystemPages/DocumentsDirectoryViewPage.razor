@@ -1,43 +1,76 @@
-﻿@page "/documents/{currentDirectoryName}"
+﻿@page "/documents/{*CurrentDirectoryName}"
 @inject IDirectoryService DirectoryService
 @inject IWebHostEnvironment Environment
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@attribute [Authorize]
 
-<h3>@CurrentDirectoryName</h3>
+@if (CurrentDirectoryName == "uploads")
+{
+    <h3>Документы</h3>
+}
+else
+{
+    <h3>Документы/@Regex.Match(CurrentDirectoryName, @"(?<=uploads/).*$").Value</h3>
+}
+
 <br />
-<MudButton OnClick="OpenAddFileDialog" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileUpload" Color="Color.Primary">Добавить файл</MudButton>
+<MudButton OnClick=DirectoryAdd Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CreateNewFolder" Color="Color.Primary">Добавить папку</MudButton>
+<MudButton OnClick="OpenAddFileDialog" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.NoteAdd" Color="Color.Primary">Добавить файл</MudButton>
 <br />
 <br />
 <hr style="color: black" />
 <br />
-@if (_files.Count < 1)
+@if (_directoriesAndFiles.Count < 1)
 {
     <MudText Typo="Typo.h6">Файлов нет</MudText>
 }
 else
 {
-    <MudDataGrid T="Dictionary<string, string>" Items="@_normalFilesNames" RowClick="DownloadFileFromStream"
+    <MudDataGrid T="Tuple<string, string, ContentType>" Items="@_directoriesAndFiles" RowClick="RowClickEvent"
                  SortMode="SortMode.Multiple" Filterable="true" QuickFilter="_quickFilter">
         <ToolBarContent>
-            <MudText>Файлы</MudText>
-            <MudSpacer />
             <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <Columns>
-            <TemplateColumn Title="Имя файла" Sortable="true" Filterable="true">
+            <TemplateColumn Title="Название" Sortable="true" Filterable="true">
                 <CellTemplate>
-                    <MudIcon Icon="@Icons.Material.Filled.FileUpload"></MudIcon>
-                    <MudLink>@context.Item.Keys.FirstOrDefault(x => !string.IsNullOrEmpty(x))</MudLink>
+                    <MudIcon Icon="@context.Item.Item1" />
+                    <MudLink>@context.Item.Item2</MudLink>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Действия" Sortable="false" Filterable="false">
+                <CellTemplate>
+                    @switch (context.Item.Item3)
+                    {
+                        case ContentType.File:
+                            <MudButton OnClick="((e) => FileDelete(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Error">
+                                <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                            </MudButton>
+                            break;
+                        case ContentType.Directory:
+                            <MudButton OnClick="((e) => DirectoryDelete(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Error">
+                                <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                            </MudButton>
+                            <MudButton OnClick="((e) => DirectoryRename(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Primary">
+                                <MudIcon Icon="@Icons.Material.Filled.Edit" />
+                            </MudButton>
+                            <MudButton OnClick="((e) => DirectoryDownload(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Info">
+                                <MudIcon Icon="@Icons.Material.Filled.DownloadForOffline" />
+                            </MudButton>
+                            break;
+                    }
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
     </MudDataGrid>
 }
 
-<MudDialog @bind-IsVisible="_isAddFileDialogOpened" Options="_createDialogOptions">
+<MudDialog @bind-IsVisible="_isAddFileDialogOpened" Options="_dialogOptions">
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Icon="@Icons.Material.Filled.FileUpload" Class="mr-3" /> Добавить файл
@@ -77,32 +110,192 @@ else
 @code {
     [Parameter]
     public string CurrentDirectoryName { get; set; }
+    private DirectoryInfo _directory { get; set; }
     private string _uploadsDirectoryPath = string.Empty;
+    private string _directoryName = string.Empty;
+    private string _searchString;
+    private const long MAX_FILE_SIZE = long.MaxValue;
     private bool _isAddFileDialogOpened = false;
+    private List<string> _indexes = new();
     private List<FileInfo> _files = new();
     private List<IBrowserFile> _filesAwaitToUpload = new();
-    private DialogOptions _createDialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
-    private const long MAX_FILE_SIZE = long.MaxValue;
-    private List<Dictionary<string, string>> _normalFilesNames = new();
-    private string _searchString;
+    private ObservableCollection<Tuple<string, string, ContentType>> _directoriesAndFiles = new();
+    private DialogOptions _dialogOptions = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
     protected override void OnInitialized()
     {
-        _uploadsDirectoryPath = Path.Combine(Environment.ContentRootPath, "uploads");
-        _files = DirectoryService.GetFilesInfo(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName));
+        _uploadsDirectoryPath = Path.Combine(Environment.ContentRootPath);
 
-        foreach (var file in _files)
+        UpdateItemsList();
+    }
+
+    private void UpdateItemsList()
+    {
+        _directoriesAndFiles = DirectoryService.GetDirectoriesAndFiles(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName));
+
+        ObservableCollection<Tuple<string, string, ContentType>> newDirectoriesAndFiles = new();
+
+        foreach (var tuple in _directoriesAndFiles)
         {
-            Dictionary<string, string> newDict = new Dictionary<string, string>()
+            if (tuple.Item3 == ContentType.Directory)
             {
-                { Regex.Match(file.Name, @"^.*?(?=_addition-)").Value , file.FullName }
-            };
+                newDirectoriesAndFiles.Add(new Tuple<string, string, ContentType>(tuple.Item1, tuple.Item2, tuple.Item3)); //TODO: Whole rework, making with DB
+            }
+            else if (tuple.Item3 == ContentType.File)
+            {
+                var fileName = tuple.Item2;
+                var filePath = Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, fileName);
+                var normalFileName = Regex.Match(fileName, @"^.*?(?=_addition-)").Value;
 
-            _normalFilesNames.Add(newDict); //TODO: Bad thing, need make this right way
+                if (string.IsNullOrEmpty(normalFileName))
+                    normalFileName = fileName;
+
+                newDirectoriesAndFiles.Add(new Tuple<string, string, ContentType>(tuple.Item1, normalFileName, tuple.Item3));
+            }
+
+            _indexes.Add(tuple.Item2);
+        }
+
+        _directoriesAndFiles = newDirectoriesAndFiles;
+    }
+
+    private async Task DirectoryAdd()
+    {
+        IDialogReference dialog = await DialogService.ShowAsync<DirectoryAddDialog>("Delete directory");
+        DialogResult result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            string? directoryNameToCreate = result.Data.ToString();
+
+            if (string.IsNullOrEmpty(directoryNameToCreate))
+                throw new Exception("CUSTOM EXCEPTION WHILE DELETE DIRECTORY"); //TODO: Custom exception
+
+            string directoryPathToCreate = Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, directoryNameToCreate);
+            Directory.CreateDirectory(directoryPathToCreate);
+
+            UpdateItemsList();
         }
     }
 
-    private async void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    private async Task DirectoryDownload(string directoryPath)
+    {
+        DirectoryInfo directoryInfo = new(directoryPath);
+        DialogParameters<DirectoryDownloadDialog> parameters = new() { { x => x.DirectoryToDownload, directoryInfo } };
+
+        IDialogReference dialog = await DialogService.ShowAsync<DirectoryDownloadDialog>("Download directory", parameters);
+        DialogResult result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            DirectoryInfo? directoryToDownload = new(result.Data.ToString());
+            string directoryPathToDownload = directoryToDownload.FullName;
+
+            if (string.IsNullOrEmpty(directoryPathToDownload))
+                throw new Exception("CUSTOM EXCEPTION WHILE DELETE DIRECTORY"); //TODO: Custom exception
+
+            string zipFilePath = $"{Path.Combine(directoryToDownload.Parent.FullName, directoryInfo.Name)}.zip";
+            ZipFile.CreateFromDirectory(directoryPathToDownload, zipFilePath, compressionLevel: CompressionLevel.Optimal, true);
+
+            FileInfo zipFileInfo = new(zipFilePath);
+
+            await DownloadZipDirectory(zipFileInfo);
+            File.Delete(zipFilePath);
+            Snackbar.Add($"Скачивание папки '{directoryInfo.Name}' завершено", MudBlazor.Severity.Success);
+        }
+    }
+
+    private async Task DownloadZipDirectory(FileInfo fileInfo)
+    {
+        string streamPath = fileInfo.FullName;
+        FileStream fileStream = File.OpenRead(streamPath);
+        string fileName = fileInfo.Name;
+
+        using DotNetStreamReference streamRef = new(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+    private async Task DirectoryRename(string directoryPath)
+    {
+        DirectoryInfo directoryInfo = new(directoryPath);
+        DialogParameters<DirectoryRenameDialog> parameters = new() { { x => x.DirectoryToRename, directoryInfo } };
+
+        IDialogReference dialog = await DialogService.ShowAsync<DirectoryRenameDialog>("Rename directory", parameters);
+        DialogResult result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            string directoryNewName = result.Data.ToString();
+
+            Directory.Move(directoryInfo.FullName, Path.Combine(directoryInfo.Parent.FullName, directoryNewName));
+
+            UpdateItemsList();
+        }
+    }
+
+    private async Task DirectoryDelete(string directoryPath)
+    {
+        DirectoryInfo directoryInfo = new(directoryPath);
+        DialogParameters<DirectoryDeleteDialog> parameters = new() { { x => x.DirectoryToDelete, directoryInfo } };
+
+        IDialogReference dialog = await DialogService.ShowAsync<DirectoryDeleteDialog>("Delete directory", parameters);
+        DialogResult result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            string? directoryToDeletePath = result.Data.ToString();
+            bool recursive = true;
+
+            if (string.IsNullOrEmpty(directoryToDeletePath))
+                throw new Exception("CUSTOM EXCEPTION WHILE DELETE DIRECTORY"); //TODO: Custom exception
+
+            Directory.Delete(directoryToDeletePath, recursive);
+
+            UpdateItemsList();
+        }
+    }
+
+    private async Task FileDelete(string filePath)
+    {
+        FileInfo fileInfo = new(filePath);
+        DialogParameters<FileDeleteDialog> parameters = new() { { x => x.FileToDelete, fileInfo } };
+
+        IDialogReference dialog = await DialogService.ShowAsync<FileDeleteDialog>("Delete file", parameters);
+        DialogResult result = await dialog.Result;
+
+        string fileName = fileInfo.Name;
+
+        if (!result.Canceled)
+        {
+            _directoriesAndFiles.Remove(_directoriesAndFiles.FirstOrDefault(x => x.Item2 == fileName));
+
+            List<string> files = Directory.GetFiles(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName)).ToList();
+            List<FileInfo> filesInfo = new();
+
+            foreach (string file in files)
+                filesInfo.Add(new FileInfo(file));
+
+            string fileTruePath = filesInfo.FirstOrDefault(x => x.Name.StartsWith(fileName)).FullName; //TODO: Rework this bad unstable thing
+
+            File.Delete(fileTruePath);
+        }
+    }
+
+    private async void RowClickEvent(DataGridRowClickEventArgs<Tuple<string, string, ContentType>> args)
+    {
+        switch (args.Item.Item3)
+        {
+            case ContentType.File:
+                await DownloadFileFromStream(args);
+                return;
+            case ContentType.Directory:
+                NavigationManager.NavigateTo($"/documents/{Path.Combine(CurrentDirectoryName, args.Item.Item2)}", true);
+                return;
+        }
+    }
+
+    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
         foreach (var file in files)
             _filesAwaitToUpload.Add(file);
@@ -132,16 +325,18 @@ else
         {
             Console.WriteLine($"PROGRAM EXCEPTION CATCH: {ex.Message}");
         }
-
-        NavigationManager.NavigateTo($"/documents/{CurrentDirectoryName}", true);
+        finally
+        {
+            NavigationManager.NavigateTo($"documents/{CurrentDirectoryName}", true);
+        }
     }
 
-    private Stream GetFileStream(string path) => File.OpenRead(path);
-
-    private async Task DownloadFileFromStream(DataGridRowClickEventArgs<Dictionary<string, string>> dict)
+    private async Task DownloadFileFromStream(DataGridRowClickEventArgs<Tuple<string, string, ContentType>> dict)
     {
-        var fileStream = GetFileStream(dict.Item.Values.FirstOrDefault(x => !string.IsNullOrEmpty(x)));
-        var fileName = dict.Item.Keys.FirstOrDefault(x => !string.IsNullOrEmpty(x));
+        var streamPath = Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, _indexes[dict.RowIndex]);
+        var fileStream = File.OpenRead(streamPath);
+        var fileName = dict.Item.Item2;
+        var fileExtention = new FileInfo(streamPath).Extension;
 
         using var streamRef = new DotNetStreamReference(stream: fileStream);
 
@@ -151,12 +346,28 @@ else
     private void OpenAddFileDialog() => _isAddFileDialogOpened = true;
     private void CloseAddFileDialog() => _isAddFileDialogOpened = false;
 
-    private Func<Dictionary<string, string>, bool> _quickFilter => x =>
+    private void CreateDirectory(string directoryName)
+    {
+        try
+        {
+            var workingDirectory = Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName);
+            var pathToDirectory = Path.Combine(workingDirectory, directoryName);
+            DirectoryService.Create(pathToDirectory);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception.Message);
+        }
+
+        UpdateItemsList();
+    }
+
+    private Func<Tuple<string, string, ContentType>, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
 
-        if (x.Keys.FirstOrDefault().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.Item2.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;

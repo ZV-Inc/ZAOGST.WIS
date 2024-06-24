@@ -40,6 +40,7 @@ builder.Services.AddBlazorTable();
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthentication("Identity.Application").AddCookie("");
 builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
@@ -52,6 +53,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseStaticFiles();
 

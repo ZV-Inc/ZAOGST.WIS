@@ -1,0 +1,42 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Downloading" Class="mr-3 mb-n1" />
+            Скачать папку в формате архива (.zip)
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Placeholder="@_directoryName" Value="@_directoryName" Label="Название скачиваемой папки" ReadOnly="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" OnClick="RenameDirectory">Скачать</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public DirectoryInfo DirectoryToDownload { get; set; }
+    private string _directoryName = string.Empty;
+    private string _directoryPath = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _directoryName = DirectoryToDownload.Name;
+        _directoryPath = DirectoryToDownload.FullName;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void RenameDirectory()
+    {
+        Snackbar.Add($"Скачивание папки '{_directoryName}' началось", MudBlazor.Severity.Info);
+
+        MudDialog.Close(DialogResult.Ok(_directoryPath));
+    }
+}

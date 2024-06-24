@@ -1,0 +1,38 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3 mb-n1" />
+            Переименовать папку
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Placeholder="@DirectoryToRename.Name" @bind-Value="_directoryNewName" Label="Новое название папки" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" OnClick="RenameDirectory">Переименовать</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public DirectoryInfo DirectoryToRename { get; set; }
+    private string _directoryNewName = string.Empty;
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void RenameDirectory()
+    {
+        if (DirectoryToRename.Name != _directoryNewName)
+        {
+            Snackbar.Add($"Название папки '{DirectoryToRename.Name}' успешно изменено на '{_directoryNewName}'", MudBlazor.Severity.Success);
+
+            MudDialog.Close(DialogResult.Ok(_directoryNewName));
+        }
+    }
+}

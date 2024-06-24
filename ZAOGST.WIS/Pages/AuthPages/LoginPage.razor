@@ -6,59 +6,71 @@
 
 <PageTitle>Вход</PageTitle>
 
+<AuthorizeView>
+    <Authorized>
+        @RedirectToSipmentsView()
+    </Authorized>
+</AuthorizeView>
+
 <div class="custom-body">
-	<div class="custom-container">
-		<div class="logo">
-			<img width="250" src="img/Logo-GST_Centr.png" />
-			<br />
-			<br />
-		</div>
-		<EditForm Model="@_user" OnValidSubmit="() => HandleSubmit()" class="custom-form">
-			<FluentValidationValidator />
-			<div class="user-box">
-				<InputText @bind-Value="@_user.Username" class="custom-input" />
-				<label class="custom-label">Имя пользователя</label>
-				<ValidationMessage For="() => _user.Username" />
-			</div>
-			<div class="user-box">
-				<InputText @bind-Value="@_user.Password" type="password" class="custom-input" />
-				<label class="custom-label">Пароль</label>
-				<ValidationMessage For="() => _user.Password" />
-			</div>
-			<span class="custom-span">
-				<button type="submit">Войти</button>
-			</span>
-		</EditForm>
-		<div class="social">
-			<div class="icons">
-				<div class="social-icon" style="background-color: red"><a href="https://zaogst.ru/" target="_blank" rel="noopener noreferrer" class="fa-solid fa-fire-extinguisher" title="Сайт АО НПЦ ГСТ"></a></div>
-				<a href="https://t.me/Zeerck" target="_blank" rel="noopener noreferrer" class="fa-brands fa-telegram" style="color: #0088CC; width: 50px; height: 50px; font-size: 50px;" title="Связь с разработчиком"></a>
-			</div>
-		</div>
-	</div>
+    <div class="custom-container">
+        <div class="logo">
+            <img width="250" src="img/Logo-GST_Centr.png" />
+            <br />
+            <br />
+        </div>
+        <EditForm Model="@_user" OnValidSubmit="() => HandleSubmit()" class="custom-form">
+            <FluentValidationValidator />
+            <div class="user-box">
+                <InputText @bind-Value="@_user.Username" class="custom-input" />
+                <label class="custom-label">Имя пользователя</label>
+                <ValidationMessage For="() => _user.Username" />
+            </div>
+            <div class="user-box">
+                <InputText @bind-Value="@_user.Password" type="password" class="custom-input" />
+                <label class="custom-label">Пароль</label>
+                <ValidationMessage For="() => _user.Password" />
+            </div>
+            <span class="custom-span">
+                <button type="submit">Войти</button>
+            </span>
+        </EditForm>
+        <div class="social">
+            <div class="icons">
+                <div class="social-icon" style="background-color: red"><a href="https://zaogst.ru/" target="_blank" rel="noopener noreferrer" class="fa-solid fa-fire-extinguisher" title="Сайт АО НПЦ ГСТ"></a></div>
+                <a href="https://t.me/Zeerck" target="_blank" rel="noopener noreferrer" class="fa-brands fa-telegram" style="color: #0088CC; width: 50px; height: 50px; font-size: 50px;" title="Связь с разработчиком"></a>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
-	private UserLoginDto _user = new();
+    private UserLoginDto _user = new();
 
-	private async Task HandleSubmit()
-	{
-		User? userEntity = await UserService.GetByUsername(_user.Username);
+    private string? RedirectToSipmentsView()
+    {
+        NavigationManager.NavigateTo("/shipmentsview", true);
+        return string.Empty;
+    }
 
-		if (userEntity == null || !BCrypt.Net.BCrypt.Verify(_user.Password, userEntity.Password)/* userEntity.Password != _user.Password */)
-		{
-			await JsRuntime.InvokeVoidAsync("alert", "Неверное имя пользователя или пароль.");
-			return;
-		}
+    private async Task HandleSubmit()
+    {
+        User? userEntity = await UserService.GetByUsername(_user.Username);
 
-		CustomAuthenticationStateProvider? customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+        if (userEntity == null || !BCrypt.Net.BCrypt.Verify(_user.Password, userEntity.Password))
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Неверное имя пользователя или пароль.");
+            return;
+        }
 
-		await customAuthStateProvider.UpdateAuthenticationState(new UserSession
-			{
-				Username = userEntity.Username,
-				Role = userEntity.Role
-			});
+        CustomAuthenticationStateProvider? customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
 
-		NavigationManager.NavigateTo("/shipmentsview", true);
-	}
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                Username = userEntity.Username,
+                Role = userEntity.Role
+            });
+
+        RedirectToSipmentsView();
+    }
 }

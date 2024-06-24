@@ -1,0 +1,41 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+            Удалить файл?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Value="@_fileName" Label="Название файла который будет удален" ReadOnly="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteFile">Удалить</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public FileInfo FileToDelete { get; set; }
+    private string _fileName = string.Empty;
+    private string _filePath = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _fileName = FileToDelete.Name;
+        _filePath = FileToDelete.FullName;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void DeleteFile()
+    {
+        Snackbar.Add($"файл '{_fileName}' успешно удалён", MudBlazor.Severity.Success);
+        MudDialog.Close(DialogResult.Ok(_filePath));
+    }
+}

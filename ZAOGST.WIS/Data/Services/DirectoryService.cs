@@ -1,4 +1,7 @@
-﻿namespace ZAOGST.WIS.Data.Services;
+﻿using MudBlazor;
+using System.Collections.ObjectModel;
+
+namespace ZAOGST.WIS.Data.Services;
 
 public class DirectoryService : IDirectoryService
 {
@@ -31,4 +34,20 @@ public class DirectoryService : IDirectoryService
     }
 
     public DirectoryInfo Create(string path) => Directory.CreateDirectory(path);
+
+    public ObservableCollection<Tuple<string, string, ContentType>> GetDirectoriesAndFiles(string uploadsDirectoryPath)
+    {
+        ObservableCollection<Tuple<string, string, ContentType>> directoriesAndFiles = new();
+
+        List<DirectoryInfo> directories = GetDirectoriesInfo(uploadsDirectoryPath);
+        List<FileInfo> files = GetFilesInfo(uploadsDirectoryPath);
+
+        foreach (DirectoryInfo directory in directories)
+            directoriesAndFiles.Add(new Tuple<string, string, ContentType>(Icons.Material.Filled.Folder, directory.Name, ContentType.Directory));
+
+        foreach (FileInfo file in files)
+            directoriesAndFiles.Add(new Tuple<string, string, ContentType>(Icons.Material.Outlined.InsertDriveFile, file.Name, ContentType.File));
+
+        return directoriesAndFiles;
+    }
 }

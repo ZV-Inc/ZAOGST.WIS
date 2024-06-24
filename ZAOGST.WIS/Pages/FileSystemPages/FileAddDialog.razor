@@ -1,0 +1,51 @@
+﻿@inject ISnackbar Snackbar
+@* <MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.FileUpload" Class="mr-3" /> Добавить файл
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".pdf" FilesChanged="UploadFiles" MaximumFileCount="100" Multiple>
+            <ButtonTemplate>
+                <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.UploadFile" for="@context.Id">
+                    Выбрать файлы
+                </MudButton>
+                <br />
+                <hr style="color: black" />
+                <br />
+            </ButtonTemplate>
+            <SelectedTemplate>
+                @if (context != null)
+                {
+                    @foreach (var file in context)
+                    {
+                        <MudText>@file.Name</MudText>
+                    }
+                }
+                else
+                {
+                    <MudText>Файлы не выбраны</MudText>
+                }
+            </SelectedTemplate>
+        </MudFileUpload>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Style="background-color: lightgray" OnClick="CloseAddFileDialog" Class="px-10">Отмена</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ProcessUploadFiles" Class="px-10">Добавить</MudButton>
+    </DialogActions>
+</MudDialog> *@
+@code {
+    //TODO: Не забыть реализовать
+    // [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    // private string _directoryName = string.Empty;
+
+    // private void Cancel() => MudDialog.Cancel();
+
+    // private void AddDirectory()
+    // {
+    //     Snackbar.Add($"Папка '{_directoryName}' успешно добавлена", MudBlazor.Severity.Success);
+    //     MudDialog.Close(DialogResult.Ok(_directoryName));
+    // }
+}

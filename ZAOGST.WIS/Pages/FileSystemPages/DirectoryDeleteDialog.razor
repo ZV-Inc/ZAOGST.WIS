@@ -1,0 +1,41 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+            Удалить папку и все её вложенные файлы и подпапки?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Value="@_directoryName" Label="Название папки которая будет удалена" ReadOnly="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteDirectory">Удалить</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public DirectoryInfo DirectoryToDelete { get; set; }
+    private string _directoryName = string.Empty;
+    private string _directoryPath = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _directoryName = DirectoryToDelete.Name;
+        _directoryPath = DirectoryToDelete.FullName;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void DeleteDirectory()
+    {
+        Snackbar.Add($"Папка '{_directoryName}' успешно удалена", MudBlazor.Severity.Success);
+        MudDialog.Close(DialogResult.Ok(_directoryPath));
+    }
+}

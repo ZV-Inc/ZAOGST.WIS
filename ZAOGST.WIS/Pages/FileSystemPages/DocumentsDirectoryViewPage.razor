@@ -1,11 +1,11 @@
 ﻿@page "/documents/{*CurrentDirectoryName}"
 @inject IDirectoryService DirectoryService
 @inject IWebHostEnvironment Environment
-@inject HttpClient HttpClient
-@inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 @if (CurrentDirectoryName == "uploads")
@@ -18,8 +18,10 @@ else
 }
 
 <br />
-<MudButton OnClick=DirectoryAdd Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CreateNewFolder" Color="Color.Primary">Добавить папку</MudButton>
-<MudButton OnClick="OpenAddFileDialog" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.NoteAdd" Color="Color.Primary">Добавить файл</MudButton>
+<AuthorizeView Roles=@UserRoles.Admin Context="inner">
+    <MudButton OnClick=DirectoryAdd Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CreateNewFolder" Color="Color.Primary">Добавить папку</MudButton>
+    <MudButton OnClick=OpenAddFileDialog Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.NoteAdd" Color="Color.Primary">Добавить файл</MudButton>
+</AuthorizeView>
 <br />
 <br />
 <hr style="color: black" />
@@ -48,17 +50,21 @@ else
                     @switch (context.Item.Item3)
                     {
                         case ContentType.File:
-                            <MudButton OnClick="((e) => FileDelete(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Error">
-                                <MudIcon Icon="@Icons.Material.Filled.Delete" />
-                            </MudButton>
+                            <AuthorizeView Roles=@UserRoles.Admin Context="inner">
+                                <MudButton OnClick="((e) => FileDelete(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Error">
+                                    <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                                </MudButton>
+                            </AuthorizeView>
                             break;
                         case ContentType.Directory:
-                            <MudButton OnClick="((e) => DirectoryDelete(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Error">
-                                <MudIcon Icon="@Icons.Material.Filled.Delete" />
-                            </MudButton>
-                            <MudButton OnClick="((e) => DirectoryRename(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Primary">
-                                <MudIcon Icon="@Icons.Material.Filled.Edit" />
-                            </MudButton>
+                            <AuthorizeView Roles=@UserRoles.Admin Context="inner">
+                                <MudButton OnClick="((e) => DirectoryDelete(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Error">
+                                    <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                                </MudButton>
+                                <MudButton OnClick="((e) => DirectoryRename(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Primary">
+                                    <MudIcon Icon="@Icons.Material.Filled.Edit" />
+                                </MudButton>
+                            </AuthorizeView>
                             <MudButton OnClick="((e) => DirectoryDownload(Path.Combine(_uploadsDirectoryPath, CurrentDirectoryName, context.Item.Item2)))" Variant="@Variant.Filled" Color="Color.Info">
                                 <MudIcon Icon="@Icons.Material.Filled.DownloadForOffline" />
                             </MudButton>

@@ -8,11 +8,11 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Placeholder="@DirectoryToRename.Name" @bind-Value="_directoryNewName" Label="Новое название папки" />
+        <MudTextField T="string" Placeholder="@DirectoryToRename.Name" @bind-Value="_directoryNewName" Label="Новое название папки" Validation="@(new Func<string, IEnumerable<string>>(Validate))" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="Color.Primary" OnClick="RenameDirectory">Переименовать</MudButton>
+        <MudButton Disabled=@(!success) Color="Color.Primary" OnClick="RenameDirectory">Переименовать</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -20,6 +20,7 @@
 
     [Parameter] public DirectoryInfo DirectoryToRename { get; set; }
     private string _directoryNewName = string.Empty;
+    private bool success = false;
 
     private void Cancel()
     {
@@ -34,5 +35,24 @@
 
             MudDialog.Close(DialogResult.Ok(_directoryNewName));
         }
+    }
+
+    private IEnumerable<string> Validate(string directoryName)
+    {
+        success = false;
+
+        if (string.IsNullOrWhiteSpace(directoryName))
+        {
+            yield return "Название папки обязательно!";
+            yield break;
+        }
+
+        if (directoryName.Contains('.'))
+        {
+            yield return "Недопустимые символы в названии (.)";
+            yield break;
+        }
+
+        success = true;
     }
 }

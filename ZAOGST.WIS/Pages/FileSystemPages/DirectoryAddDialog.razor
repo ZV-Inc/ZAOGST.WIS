@@ -7,17 +7,17 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField @bind-Value="_directoryName" Label="Имя папки" Variant="Variant.Text"></MudTextField>
+        <MudTextField @bind-Value="_directoryName" Label="Имя папки" Variant="Variant.Text" Validation="@(new Func<string, IEnumerable<string>>(Validate))"></MudTextField>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Style="background-color: lightgray" OnClick=Cancel Class="px-10">Отмена</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick=AddDirectory Class="px-10">Добавить</MudButton>
+        <MudButton Disabled="@(!success)" Variant="Variant.Filled" Color="Color.Primary" OnClick=AddDirectory Class="px-10">Добавить</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
     private string _directoryName = string.Empty;
+    private bool success = false;
 
     private void Cancel() => MudDialog.Cancel();
 
@@ -25,5 +25,24 @@
     {
         Snackbar.Add($"Папка '{_directoryName}' успешно добавлена", MudBlazor.Severity.Success);
         MudDialog.Close(DialogResult.Ok(_directoryName));
+    }
+
+    private IEnumerable<string> Validate(string directoryName)
+    {
+        success = false;
+
+        if (string.IsNullOrWhiteSpace(directoryName))
+        {
+            yield return "Название папки обязательно!";
+            yield break;
+        }
+
+        if (directoryName.Contains('.'))
+        {
+            yield return "Недопустимые символы в названии (.)";
+            yield break;
+        }
+
+        success = true;
     }
 }

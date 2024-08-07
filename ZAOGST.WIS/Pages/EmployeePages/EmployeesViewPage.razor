@@ -27,15 +27,15 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		List<User> list = await UserService.GetList();
+		List<User> usersList = await UserService.GetList();
 
-		_rootUser = list.FirstOrDefault(x => x.Username == "ZV");
+		_rootUser = usersList.FirstOrDefault(x => x.Username == "ZV");
 		_authState = await AuthStateProvider.GetAuthenticationStateAsync();
 
-		if (_authState.User.Identity.Name != _rootUser.Username && list.Contains(_rootUser))
-			list.Remove(_rootUser);
+		if (_authState.User.Identity.Name != _rootUser.Username && usersList.Contains(_rootUser))
+			usersList.Remove(_rootUser);
 
-		_userData = list.OrderBy(x => x.Id).ToList();
+		_userData = usersList.OrderBy(x => x.Id).ToList();
 	}
 
 	private void RowClick(User user)
